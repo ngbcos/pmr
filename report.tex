@@ -1,0 +1,580 @@
+%%% Template originaly created by Karol Kozioł (mail@karol-koziol.net) and modified for ShareLaTeX use
+
+\documentclass[a4paper,11pt]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{xcolor}
+
+\renewcommand\familydefault{\sfdefault}
+\usepackage{tgheros}
+\usepackage[defaultmono]{droidmono}
+
+\usepackage{amsmath,amssymb,amsthm,textcomp}
+\usepackage{enumerate}
+\usepackage{multicol}
+\usepackage{tikz}
+\usetikzlibrary{bayesnet}
+\usepackage[bb=boondox]{mathalfa}
+
+\usepackage{geometry}
+\geometry{total={210mm,297mm},
+left=25mm,right=25mm,%
+bindingoffset=0mm, top=20mm,bottom=20mm}
+
+
+\linespread{1.3}
+
+\newcommand{\linia}{\rule{\linewidth}{0.5pt}}
+
+% custom theorems if needed
+\newtheoremstyle{mytheor}
+    {1ex}{1ex}{\normalfont}{0pt}{\scshape}{.}{1ex}
+    {{\thmname{#1 }}{\thmnumber{#2}}{\thmnote{ (#3)}}}
+
+\theoremstyle{mytheor}
+\newtheorem{defi}{Definition}
+
+% my own titles
+\makeatletter
+\renewcommand{\maketitle}{
+\begin{center}
+\vspace{2ex}
+{\huge \textsc{\@title}}
+\vspace{1ex}
+\\
+\linia\\
+\@author \hfill \@date
+\vspace{4ex}
+\end{center}
+}
+\makeatother
+%%%
+
+% custom footers and headers
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\lhead{}
+\chead{}
+\rhead{}
+\lfoot{Assignment \textnumero{} 1}
+\cfoot{}
+\rfoot{Page \thepage}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+%sections
+\renewcommand\thesection{\arabic{section}}
+\renewcommand\thesubsection{\thesection.\alph{subsection}}
+
+%
+
+% code listing settings
+\usepackage{listings}
+\lstset{
+    language=Python,
+    basicstyle=\ttfamily\small,
+    aboveskip={1.0\baselineskip},
+    belowskip={1.0\baselineskip},
+    columns=fixed,
+    extendedchars=true,
+    breaklines=true,
+    tabsize=4,
+    prebreak=\raisebox{0ex}[0ex][0ex]{\ensuremath{\hookleftarrow}},
+    frame=lines,
+    showtabs=false,
+    showspaces=false,
+    showstringspaces=false,
+    keywordstyle=\color[rgb]{0.627,0.126,0.941},
+    commentstyle=\color[rgb]{0.133,0.545,0.133},
+    stringstyle=\color[rgb]{01,0,0},
+    numbers=left,
+    numberstyle=\small,
+    stepnumber=1,
+    numbersep=10pt,
+    captionpos=t,
+    escapeinside={\%*}{*)}
+}
+
+%%%----------%%%----------%%%----------%%%----------%%%
+
+\newcommand{\E}{\Bbb{E}}
+
+\newcommand{\Var}{\mathrm{Var}}
+
+\newcommand{\Cov}{\mathrm{Cov}}
+
+
+\begin{document}
+
+\title{Probabilistic Modelling and Reasoning \textnumero{} 1}
+
+\author{Georgi Tinchev, s1549117, The University of Edinburgh}
+
+\date{07/03/2016}
+
+\maketitle
+
+\section{Question 1: Player skill graphical models}
+
+
+\subsection{}
+
+\begin{figure}[htpb!]
+    \centering
+    \tikz{ %
+        \node[obs] (r1) {$r^1$} ; %
+        \node[latent, above=of r1, yshift=0.5cm, xshift=-1cm] (s1) {$s_1$} ; %
+        \node[latent, above=of r1, yshift=0.5cm, xshift=0.7cm] (s2) {$s_2$} ; %
+        \node[obs, xshift=1.5cm] (r2) {$r^2$};
+        \node[latent, right=of s2] (s3) {$s_3$};
+        \factor[above=of r1, yshift=0.2cm] {r1-factor} {$\mathcal{\eta}$} {} {};
+        \factor[above=of r2, yshift=0.2cm] {r2-factor} {$\mathcal{\mu}$} {} {};
+        \node[obs, yshift=4.5cm, xshift=0.7cm] (r3) {$r^3$};
+        \factor[below=of r3, yshift=-0.4cm, xshift=0cm] {r3-factor} {$\mathcal{\phi}$} {} {};
+        \edge {s1,s2} {r1-factor} ; %
+        \edge{s2,s3} {r2-factor};
+        \edge{s1,s3} {r3-factor};
+        \factoredge {} {r1-factor} {r1} ; %
+        \factoredge {} {r2-factor} {r2} ; %
+        \factoredge {} {r3-factor} {r3} ; %
+    }
+    \caption{Factor graph of simple player skill model when observing three games between three players. The games are denoted as the factors $\phi$, $\mu$ and $\eta$. Game outcomes are denoted as $r^{(k)}$, where $k\in{\{1,2,3\}}$ being the different games played. The result of the games, denoted $r^{(k)}\in{\{0,1\}}$ with 0 indicating a loss and 1 indicating a win. The players' skills are identified as $s_1$, $s_2$ and $s_3$, where the index denotes the ID of the player $\in{\{1,2,3\}}$ respectively.}
+    \label{fig:fg}
+\end{figure}
+      
+\subsection{}
+\subsubsection{$I(s_1,s_2|r^{(2)})$}
+\label{sec:first_indep}
+There are 2 paths leading from $s_1$ to $s_2$, namely $s_1-\eta-s_2$ and $s_1-\phi-s_3-\mu-s_2$. The former path is blocked, as $\eta$ has two incoming edges and neither $\eta$, nor $r^{(1)}$ (being all descendants) are in the conditioning set (being $r^{(2)}$). The latter is also blocked, but the case is slightly more complicated. Firstly, $\mu$ has two incoming edges, however, its descendant is in the conditioning set ($r^{(2)}$), therefore, the path is not blocked there. Secondly, $\phi$ also has two incoming edges and neither $\phi$, nor $r^{(3)}$ are in the conditioning set, therefore, the path is blocked there.
+Thus, as the two paths are blocked $=> I(s_1,s_2|r^{(2)})$.
+\subsubsection{$I(s_1,s_2|r^{(2)},r^{(3)})$}
+As identified in Section~\ref{sec:first_indep}, there are 2 paths. The path $s_1-\eta-s_2$ is still blocked, as $\eta$, nor any of its descendants are in the conditioning set. The path $s_1-\phi-s_3-\mu-s_2$, however, is now unblocked, as for all factors and variables with 2 incoming edges, there is a child that belongs to the conditioning set, namely $r^{(3)}$ is a child of $\phi$ and $r^{(2)}$ is a child of $\mu$, both of them being in the conditioning set.
+
+\subsection{}
+\begin{figure}[htpb!]
+    \centering
+    \tikz{ %
+        \node[obs] (r1) {$r^1$} ; %
+        
+        \node[latent, right=of r1] (s2) {$s_2$} ; %
+        \node[obs, right=of s2] (r2) {$r^2$};
+        \node[latent, above=of s2, xshift=-1cm] (s1) {$s_1$} ; %
+        \node[latent, above=of s2, xshift=1cm] (s3) {$s_3$} ; %
+        \node[obs, above=of s2, yshift=1.5cm] (r3) {$r^3$};
+        
+        \edge[-] {s1,s2} {r1,s3} ; %
+        \edge[-] {s2,s3} {r2,s1};
+        \edge[-] {s1,s3} {r3,s2};
+        
+    }
+    \caption{Markov network of simple player skill model when observing three games between three players. The observed and latent variables are denoted in a similar way, as Figure~\ref{fig:fg}. Game outcomes are denoted as $r^{(k)}$, where $k\in{\{1,2,3\}}$ being the different games played. The result of the games, denoted $r^{(k)}\in{\{0,1\}}$ with 0 indicating a loss and 1 indicating a win. The players' skills are identified as $s_1$, $s_2$ and $s_3$, where the index denotes the ID of the player $\in{\{1,2,3\}}$ respectively.}
+    \label{fig:mn}
+\end{figure}
+
+\subsection{}
+
+
+\section{Question 2: Gaussian player skill model}
+\subsection{}
+From the figure, one can express the joint probability distribution as follows:
+
+\begin{equation}
+    \label{eq:joint_distr}
+    p(p_b,p_w,s_b,s_w) = \frac{1}{Z}\phi_{1}(p_w)\phi_{2}(s_w,p_w)\phi_{3}(s_b)\phi_{4}(s_b,p_b)\phi_{5}(p_w,p_b,r)
+\end{equation}
+
+Thereafter, using chain rule, $p(p_b,p_w|s_b,s_w)$ can be expressed as follows:
+\begin{equation}
+    \label{eq:chain_rule}
+    p(p_b,p_w|s_b,s_w) = \frac{p(p_b,p_w,s_b,s_w)}{p(s_b,s_w)} = \frac{p(p_b,p_w,s_b,s_w)}{\int_{p_b,p_w} p(p_b,p_w,s_b,s_w)}= 
+\end{equation}
+
+\begin{equation}
+    \label{eq:chain_rule_1}
+    \frac{\frac{1}{Z}\phi_{1}(s_w)\phi_{2}(s_w,p_w)\phi_{3}(s_b)\phi_{4}(s_b,p_b)\phi_{5}(p_w,p_b,r)}{\int_{p_b,p_w}\frac{1}{Z}\phi_{1}(s_w)\phi_{2}(s_w,p_w)\phi_{3}(s_b)\phi_{4}(s_b,p_b)\phi_{5}(p_w,p_b,r)}
+\end{equation}
+
+\begin{equation}
+    \label{eq:chain_rule_2}
+    \frac{\frac{1}{Z}\phi_{1}(p_w)\phi_{2}(s_w,p_w)\phi_{3}(p_b)\phi_{4}(s_b,p_b)\phi_{5}(p_w,p_b,r)}{\frac{1}{Z}\phi_{1}(p_w)\phi_{3}(p_b)\int_{p_b,p_w}\phi_{2}(s_w,p_w)\phi_{4}(s_b,p_b)\phi_{5}(p_w,p_b,r)}
+\end{equation}
+
+\begin{equation}
+    \label{eq:chain_rule_3}
+    \frac{\phi_{2}(s_w,p_w)\phi_{4}(s_b,p_b)\phi_{5}(p_w,p_b,r)}{\int_{p_b,p_w}\phi_{2}(s_w,p_w)\phi_{4}(s_b,p_b)\phi_{5}(p_w,p_b,r)}
+\end{equation}
+
+\begin{equation}
+    \label{eq:chain_rule_4}
+    \frac{\phi_{2}(s_w,p_w)\phi_{4}(s_b,p_b)}{\int_{p_b,p_w}\phi_{2}(s_w,p_w)\phi_{4}(s_b,p_b)}
+\end{equation}
+
+\begin{equation}
+    \label{eq:chain_rule_5}
+    \phi_{2}(s_w,p_w)\phi_{4}(s_b,p_b)
+\end{equation}
+
+\subsection{}
+% for E[theta]
+\subsubsection{$\E[\theta \mid s_b,s_w]$}
+
+\begin{equation}
+    \label{e_theta}
+    \Bbb{E}[\theta\mid s_w,s_b] = \frac{1}{\sqrt{2}\beta}\Bbb{E}[(p_w-s_w)+(p_b-s_b) \mid s_w,s_b]
+\end{equation}
+
+\begin{equation}
+    \label{e_theta_2}
+    \frac{1}{\sqrt{2}\beta} \Bigg( \Bbb{E}[p_w+p_b \mid s_w,s_b]-s_w-s_b \Bigg)
+\end{equation}
+
+\begin{equation}
+    \label{e_theta_3}
+    \frac{1}{\sqrt{2}\beta} \Bigg( \Bbb{E}[p_w\mid s_w,s_b] + \Bbb{E}[p_b \mid s_w,s_b]-s_w-s_b \Bigg)
+\end{equation}
+
+
+\begin{equation}
+    \label{e_theta_4}
+    \frac{1}{\sqrt{2}\beta} \Bigg( s_w+s_b-s_w-s_b \Bigg) = 0
+\end{equation}
+
+% for E[psi]
+\subsubsection{$\E[\psi \mid s_b,s_w]$}
+
+\begin{equation}
+    \label{e_psi}
+    \Bbb{E}[\psi\mid s_w,s_b] = \frac{1}{\sqrt{2}\beta}\Bbb{E}[(p_w-s_w)-(p_b-s_b) \mid s_w,s_b]
+\end{equation}
+
+\begin{equation}
+    \label{e_psi_2}
+    \frac{1}{\sqrt{2}\beta} \Bigg( \Bbb{E}[p_w-p_b \mid s_w,s_b]-s_w+s_b \Bigg)
+\end{equation}
+
+\begin{equation}
+    \label{e_psi_3}
+    \frac{1}{\sqrt{2}\beta} \Bigg( \Bbb{E}[p_w\mid s_w,s_b] - \Bbb{E}[p_b \mid s_w,s_b]-s_w+s_b \Bigg)
+\end{equation}
+
+
+\begin{equation}
+    \label{e_psi_4}
+    \frac{1}{\sqrt{2}\beta} \Bigg( s_w-s_b-s_w+s_b \Bigg) = 0
+\end{equation}
+
+
+% for E[theta^2]
+\subsubsection{$\E[\theta^2 \mid s_b,s_w]$}
+
+\begin{equation}
+    \label{e_theta_sq}
+    \Bbb{E}[\theta^2\mid s_w,s_b] = \frac{1}{2\beta^2}\Bbb{E}[((p_w-s_w)+(p_b-s_b))^2 \mid s_w,s_b]
+\end{equation}
+
+\begin{equation}
+    \label{e_theta_sq_2}
+    \frac{1}{2\beta^2} \Bigg( \underbrace{\Bbb{E}[(p_w-s_w)^2\mid s_w,s_b]}_\text{A} + \underbrace{2\Bbb{E}[(p_w-s_w)(p_b-s_b)\mid s_w,s_b]}_\text{B} + \underbrace{\Bbb{E}[(p_b-s_b)^2\mid s_w,s_b]}_\text{C} \Bigg)
+\end{equation}
+
+\begin{equation}
+    \label{e_theta_sq_2_a}
+    A=\Bbb{E}[p_w^2\mid s_w,s_b] - 2s_w\Bbb{E}[p_w\mid s_w,s_b] + s_{w}^{2}
+\end{equation}
+
+\begin{equation}
+    \label{e_theta_sq_2_a_1}
+    A=\Var(p_w)+\E[p_w\mid s_w,s_b]^2 - 2s_w^2 + s_{w}^{2} = \Var(p_w) = \beta^2
+\end{equation}
+
+\begin{equation}
+    \label{e_theta_sq_2_b}
+    B=2\E[p_bp_w \mid s_w,s_b] - 2s_b\E[p_w \mid s_w,s_b] - 2s_w\E[p_b \mid s_w,s_b] + 2s_bs_w
+\end{equation}
+
+\begin{equation}
+    \label{e_theta_sq_2_b_1}
+    B=2 \Bigg( \E[p_b \mid s_w,s_b]\E[p_w \mid s_w,s_b] + \Cov(p_b,p_w) \Bigg) - 2s_bs_w - 2s_ws_b + 2s_bs_w
+\end{equation}
+
+\begin{equation}
+    \label{e_theta_sq_2_b_2}
+    B=2 \Bigg( \E[p_b \mid s_w,s_b]\E[p_w \mid s_w,s_b] + \Cov(p_b,p_w) \Bigg) - 2s_bs_w
+\end{equation}
+
+\begin{equation}
+    \label{e_theta_sq_2_b_2}
+    B=2 \Bigg( s_bs_w +  \underbrace{\Cov(p_b,p_w)}_\text{$p_w$ and $p_b$ are CI $=> \Cov(p_w,p_b)=0$} \Bigg) - 2s_bs_w=0
+\end{equation}
+
+\begin{equation}
+    \label{e_theta_sq_2_c}
+    C=\Bbb{E}[p_b^2\mid s_w,s_b] - 2s_b\Bbb{E}[p_b\mid s_w,s_b] + s_{b}^{2}
+\end{equation}
+
+\begin{equation}
+    \label{e_theta_sq_2_c_1}
+    C=\Var(p_b)+\E[p_b\mid s_w,s_b]^2 - 2s_b^2 + s_{b}^{2} = \Var(p_b) = \beta^2
+\end{equation}
+
+From Equation~\ref{e_theta_sq_2}:
+
+\begin{equation}
+    \label{e_theta_sq_all_combined}
+    \frac{1}{2\beta^2}(A+B+C)=\frac{\beta^2+0+\beta^2}{2\beta^2} = 1
+\end{equation}
+
+% for psi^2
+\subsubsection{$\E[\psi^2 \mid s_b,s_w]$}
+
+\begin{equation}
+    \label{e_psi_sq}
+    \Bbb{E}[\psi^2\mid s_w,s_b] = \frac{1}{2\beta^2}\Bbb{E}[((p_w-s_w)-(p_b-s_b))^2 \mid s_w,s_b]
+\end{equation}
+
+\begin{equation}
+    \label{e_psi_sq_2}
+    \frac{1}{2\beta^2} \Bigg( \underbrace{\Bbb{E}[(p_w-s_w)^2\mid s_w,s_b]}_\text{D} - \underbrace{2\Bbb{E}[(p_w-s_w)(p_b-s_b)\mid s_w,s_b]}_\text{E} + \underbrace{\Bbb{E}[(p_b-s_b)^2\mid s_w,s_b]}_\text{F} \Bigg)
+\end{equation}
+
+\begin{equation}
+    \label{e_psi_sq_2_a}
+    D=\Bbb{E}[p_w^2\mid s_w,s_b] - 2s_w\Bbb{E}[p_w\mid s_w,s_b] + s_{w}^{2}
+\end{equation}
+
+\begin{equation}
+    \label{e_psi_sq_2_a_1}
+    D=\Var(p_w)+\E[p_w\mid s_w,s_b]^2 - 2s_w^2 + s_{w}^{2} = \Var(p_w) = \beta^2
+\end{equation}
+
+\begin{equation}
+    \label{e_psi_sq_2_b}
+    E=2\E[p_bp_w \mid s_w,s_b] - 2s_b\E[p_w \mid s_w,s_b] - 2s_w\E[p_b \mid s_w,s_b] + 2s_bs_w
+\end{equation}
+
+\begin{equation}
+    \label{e_psi_sq_2_b_1}
+    E=2 \Bigg( \E[p_b \mid s_w,s_b]\E[p_w \mid s_w,s_b] + \Cov(p_b,p_w) \Bigg) - 2s_bs_w - 2s_ws_b + 2s_bs_w
+\end{equation}
+
+\begin{equation}
+    \label{e_psi_sq_2_b_2}
+    E=2 \Bigg( \E[p_b \mid s_w,s_b]\E[p_w \mid s_w,s_b] + \Cov(p_b,p_w) \Bigg) - 2s_bs_w
+\end{equation}
+
+\begin{equation}
+    \label{e_psi_sq_2_b_2}
+    E=2 \Bigg( s_b s_w +  \underbrace{\Cov(p_b,p_w)}_\text{$p_w$ and $p_b$ are CI $=> \Cov(p_w,p_b)=0$} \Bigg) - 2s_bs_w=0
+\end{equation}
+
+\begin{equation}
+    \label{e_psi_sq_2_c}
+    F=\Bbb{E}[p_b^2\mid s_w,s_b] - 2s_b\Bbb{E}[p_b\mid s_w,s_b] + s_{b}^{2}
+\end{equation}
+
+\begin{equation}
+    \label{e_psi_sq_2_c_1}
+    F=\Var(p_b)+\E[p_b\mid s_w,s_b]^2 - 2s_b^2 + s_{b}^{2} = \Var(p_b) = \beta^2
+\end{equation}
+
+From Equation~\ref{e_psi_sq_2}:
+
+\begin{equation}
+    \label{e_psi_sq_all_combined}
+    \frac{1}{2\beta^2}(D-E+F)=\frac{\beta^2-0+\beta^2}{2\beta^2} = 1
+\end{equation}
+
+\subsubsection{$\E[\psi\theta \mid s_b,s_w]$}
+
+\begin{equation}
+    \label{e_psi_theta}
+    \Bbb{E}[\psi\theta\mid s_w,s_b] = \frac{1}{2\beta^2}\Bbb{E}[(p_w-s_w)^2-(p_w-s_w)(p_b-s_b)+(p_w-s_w)(p_b-s_b)-(p_b-s_b)^2 \mid s_w,s_b]
+\end{equation}
+
+\begin{equation}
+    \label{e_psi_theta_1}
+    \Bbb{E}[\psi\theta\mid s_w,s_b] = \frac{1}{2\beta^2}\Bbb{E}[(p_w-s_w)^2-(p_w-s_w)(p_b-s_b)+(p_w-s_w)(p_b-s_b)-(p_b-s_b)^2 \mid s_w,s_b]
+\end{equation}
+
+\begin{equation}
+    \label{e_psi_theta_2}
+    \Bbb{E}[\psi\theta\mid s_w,s_b] = \frac{1}{2\beta^2} \Bigg( \underbrace{\Bbb{E}[(p_w-s_w)^2 \mid s_w,s_b]}_\text{G} - \underbrace{\E[(p_b-s_b)^2 \mid s_w,s_b]}_\text{H} \Bigg)
+\end{equation}
+
+\begin{equation}
+    \label{e_psi_theta_3}
+    G=\Bbb{E}[p_w^2\mid s_w,s_b] - 2s_w\Bbb{E}[p_w\mid s_w,s_b] + s_{w}^{2}
+\end{equation}
+
+\begin{equation}
+    \label{e_psi_theta_4}
+    G=\Var(p_w)+\E[p_w\mid s_w,s_b]^2 - 2s_w^2 + s_{w}^{2} = \Var(p_w) = \beta^2
+\end{equation}
+
+\begin{equation}
+    \label{e_psi_theta_5}
+    H=\Bbb{E}[p_b^2\mid s_w,s_b] - 2s_b\Bbb{E}[p_b\mid s_w,s_b] + s_{b}^{2}
+\end{equation}
+
+\begin{equation}
+    \label{e_psi_theta_6}
+    H=\Var(p_b)+\E[p_b\mid s_w,s_b]^2 - 2s_b^2 + s_{b}^{2} = \Var(p_b) = \beta^2
+\end{equation}
+
+From Equation~\ref{e_psi_theta_2}:
+
+\begin{equation}
+    \label{e_psi_theta_7}
+    G-H= \frac{\beta^2-\beta^2}{2\beta^2}=0
+\end{equation}
+
+\subsubsection{$\mathbb{p}[\theta,\psi \mid s_b,s_w]$}
+
+$\mathbb{p}(\theta|s_b,s_w)$ is a distribution, however, as it is composed of $p_w$, $p_b$, $s_w$, $s_b$, that are all Gaussian distributions, $\mathbb{p}(\theta|s_b,s_w)$ is also a Gaussian distribution. Its mean($\E[\theta|s_b,s_w]$) is 0 and its variance is 1 ($\E[\theta^2|s_b,s_w]$), therefore, $\mathbb{p}(\theta|s_b,s_w)$ is a standard normal Gaussian distribution.
+
+$\mathbb{p}(\psi|s_b,s_w)$ is a distribution, however, as it is composed of $p_w$, $p_b$, $s_w$, $s_b$, that are all Gaussian distributions, $\mathbb{p}(\psi|s_b,s_w)$ is also a Gaussian distribution. Its mean($\E[\psi|s_b,s_w]$) is 0 and its variance is 1 ($\E[\psi^2|s_b,s_w]$), therefore, $\mathbb{p}(\psi|s_b,s_w)$ is a standard normal Gaussian distribution.
+
+Based on the 2 aforementioned statements, the joint distribution $\mathbb{p}(\theta,\psi|s_b,s_w)$ is a joint standard multivariate Gaussian distribution, expressed as follows:
+
+\begin{equation}
+    \label{p_psi_theta}
+    \mathbb{p}(\theta,\psi|s_b,s_w)= \frac{1}{\sqrt{(2\pi)^2\mid\Sigma\mid}}exp \Bigg( -\frac{1}{2}(x-\mu)^T\Sigma^{-1}(x-\mu) \Bigg)
+\end{equation}
+
+With the following $x$, $\mu$ and $\Sigma$:
+
+\begin{align}
+    \label{vec_theta_psi}
+    x &= \begin{bmatrix}
+           \theta \\
+           \psi \\
+         \end{bmatrix}
+\end{align}
+
+\begin{align}
+    \label{vec_theta_psi_mean}
+    \mu &= \begin{bmatrix}
+           \E[\theta \mid s_b,s_w] \\
+           \E[\psi \mid s_b,s_w] \\
+         \end{bmatrix} = \begin{bmatrix}
+                            0 \\
+                            0 \\
+                          \end{bmatrix}
+\end{align}
+
+\begin{align}
+    \label{vec_theta_psi_cov_mat}
+    \Sigma &= \begin{bmatrix}
+           \Var(\theta) & \Cov(\theta,\psi)\\
+           \Cov(\theta,\psi) & \Var(\psi) \\
+         \end{bmatrix} = \begin{bmatrix}
+                            1 & 0 \\
+                            0 & 1 \\
+                          \end{bmatrix}
+\end{align}
+
+The $\Cov[\theta,\psi \mid s_b,s_w]=0$ as $\E[\psi\theta \mid s_b,s_w]=0$, $\E[\psi \mid s_b,s_w]=0$ and $\E[\theta \mid s_b,s_w]=0$ , meaning that $\theta$ and $\psi$ are independent.
+
+Leading to the following form:
+  
+\begin{equation}
+    \label{p_psi_theta}
+    \mathbb{p}(\theta,\psi|s_b,s_w)= \frac{1}{2\pi}exp \Big( -\frac{1}{2}(\theta^2+\psi^2) \Big)
+\end{equation}
+
+\subsection{}
+For $r= \mathbb{1}[p_b > p_w]$
+
+We can express $p_b$ and $p_w$ in terms of $\theta$ and $\psi$.
+
+\begin{equation}
+    \label{p_b_in_psi}
+    p_b = -\sqrt{2}\beta\psi + p_w - s_w + s_b
+\end{equation}
+
+\begin{equation}
+    \label{p_w_in_theta}
+    p_w = \sqrt{2}\beta\theta + s_w - p_b + s_b
+\end{equation}
+
+Substituting Equation~\ref{p_b_in_psi} in Equation~\ref{p_w_in_theta} results in:
+
+\begin{equation}
+    \label{p_b_in_p_w}
+    p_w = \sqrt{2}\beta\theta + s_w + \sqrt{2}\beta\psi - p_w + s_w - s_b + s_b
+\end{equation}
+
+\begin{equation}
+    \label{p_b_in_p_w_2}
+    p_w = \frac{\sqrt{2}\beta(\theta+\psi) + 2s_w}{2}
+\end{equation}
+
+Substituting Equation~\ref{p_w_in_theta} in Equation~\ref{p_b_in_psi} results in:
+
+\begin{equation}
+    \label{p_w_in_p_b}
+    p_b = -\sqrt{2}\beta\psi + \sqrt{2}\beta\theta + s_w - p_b + s_b - s_w + s_b
+\end{equation}
+
+\begin{equation}
+    \label{p_w_in_p_b_2}
+    p_b = \frac{\sqrt{2}\beta(\theta-\psi) + 2s_b}{2}
+\end{equation}
+
+Substituting Equation~\ref{p_b_in_p_w_2} and~\ref{p_w_in_p_b_2} in $r= \mathbb{1}[p_b > p_w]$:
+
+\begin{equation}
+    \label{p_w_and_p_b_in_r}
+    \frac{\sqrt{2}\beta(\theta-\psi) + 2s_b}{2} > \frac{\sqrt{2}\beta(\theta+\psi) + 2s_w}{2}
+\end{equation}
+
+\begin{equation}
+    \label{p_w_and_p_b_in_r_2}
+    \sqrt{2}\beta(\theta-\psi) + 2s_b > \sqrt{2}\beta(\theta+\psi) + 2s_w
+\end{equation}
+
+\begin{equation}
+    \label{p_w_and_p_b_in_r_3}
+    -\sqrt{2}\beta\psi + 2s_b > \sqrt{2}\beta\theta + 2s_w
+\end{equation}
+
+\begin{equation}
+    \label{p_w_and_p_b_in_r_4}
+    2s_b + 2s_w > 2\sqrt{2}\beta\psi
+\end{equation}
+
+\begin{equation}
+    \label{p_w_and_p_b_in_r_5}
+    \mathbb{P}(r=1|\theta,\psi,s_b,s_w)=\mathbb{1}\Bigg[\frac{s_b + s_w}{\sqrt{2}\beta} > \psi\Bigg]
+\end{equation}
+
+\subsection{}
+
+\begin{equation}
+    \mathbb{P}(r=1|s_b,s_w) = \frac{\mathbb{P}(r=1,s_b,s_w)}{\mathbb{P}(s_b,s_w)}
+\end{equation}
+
+\begin{equation}
+    \mathbb{P}(r=1|s_b,s_w) = \frac{\int_{\theta,\psi} \mathbb{P}(r=1,\theta,\psi,s_b,s_w)}{\mathbb{P}(s_b,s_w)}
+\end{equation}
+
+\begin{equation}
+    \mathbb{P}(r=1|s_b,s_w) = \frac{\int_{\theta,\psi} \mathbb{P}(r=1|\theta,\psi,s_b,s_w)\mathbb{P}(\theta,\psi,s_b,s_w)}{\mathbb{P}(s_b,s_w)}
+\end{equation}
+
+\begin{equation}
+    \mathbb{P}(r=1|s_b,s_w) = \frac{\int_{\theta,\psi} \mathbb{P}(r=1|\theta,\psi,s_b,s_w)\mathbb{P}(\theta,\psi|s_b,s_w)\mathbb{P}(s_b,s_w)}{\mathbb{P}(s_b,s_w)}
+\end{equation}
+
+Substituting Equation~\ref{p_w_and_p_b_in_r_5} and~\ref{p_psi_theta} and using $x$, $\mu$ and $\Sigma$ from Equation~\ref{vec_theta_psi},~\ref{vec_theta_psi_mean} and~\ref{vec_theta_psi_cov_mat}:
+
+\begin{equation}
+    \mathbb{P}(r=1|s_b,s_w) = \int_{\theta,\psi} \mathbb{1}\Bigg[\frac{s_b+s_w}{\sqrt{2}\beta}>\psi\Bigg]
+    \mathcal{N}\Big( x|\mu,\Sigma \Big) = \Phi\Bigg[ \frac{s_b-s_w}{\sqrt{2}\beta} \Bigg]
+\end{equation}
+
+\subsection{}
+
+\section{}
+\end{document}
