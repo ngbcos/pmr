@@ -19,10 +19,9 @@ function [] = task3b()
     ylim([0 5]);
     legend('Lee Sedol','Fan Hui', 'AlphaGo', 'Location', 'northwest');
     hold off;
+  
     
     load('go_player_skill_model/full_covar.mat');
-    
-    x = -3:.1063905:3;
     
     figure(2);
     hold on;
