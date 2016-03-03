@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PMR readme</title>
+<link rel="stylesheet" href="https://stackedit.io/res-min/themes/base.css" />
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
+</head>
+<body><div class="container"><h1 id="pmr-assignment-2016">PMR Assignment 2016</h1>
+
+
+
+<h2 id="data-file-details">Data file details</h2>
+
+<p>This archive contains 4 data files</p>
+
+<ul>
+<li><code>diag_covar.npz</code> : Compressed Numpy file containing variables related to the diagonal covariance matrix Gaussian approximation to the posterior density across player skills.</li>
+<li><code>full_covar.npz</code> : Compressed Numpy file containing variables related to the full covariance matrix Gaussian approximation to the posterior density across player skills.</li>
+<li><code>diag_covar.mat</code> : MATLAB workspace file containing variables related to the diagonal covariance matrix Gaussian approximation to the posterior density across player skills. </li>
+<li><code>full_covar.mat</code> : MATLAB workspace file containing variables related to the full covariance matrix Gaussian approximation to the posterior density across player skills.</li>
+</ul>
+
+<p>The variables defined in each file are detailed in the assignment handout.</p>
+
+<h2 id="language-for-assignment">Language for assignment</h2>
+
+<p>You are free to use whichever programming language you are most comfortable with to complete the coding sections of this assignment. The main requirements are that is able to handle 1D and 2D array data and can produce good quality plot outputs. Two suggested options are</p>
+
+<ul>
+<li><p><strong>Python</strong> + <strong>Numpy</strong> <br>
+<a href="https://www.python.org/">Python</a> is a free, open source general purpose interpreted programming language. It is included by default with most Linux distributions and can be easily and freely installed on most operating systems. On Informatics DICE systems it can be loaded by running <code>python</code> from a terminal. Alternatively running <code>ipython</code> will load the enhanced interactive <a href="http://ipython.org/">IPython</a> interpreter and <code>ipython notebook</code> the web-based <a href="http://ipython.org/notebook.html">notebook interface</a>. <a href="http://www.numpy.org/">Numpy</a> is a scientific computing package in Python, defining a flexible N-dimensional array object and various mathematical and linear algebra routines. <a href="http://www.scipy.org">Scipy</a>, a closely related library, offers further useful functionality particularly in the <code>scipy.stats</code> module. Both <code>numpy</code> and <code>scipy</code> are available in the DICE Python installation.</p></li>
+<li><p><strong>MATLAB</strong> <br>
+<a href="http://uk.mathworks.com/products/matlab/">MATLAB</a> is a numerical computing environment and programming language particularly aimed at performing linear algebra like operations with large arrays of numerical data. It is a commercial product and is not freely available to download, however it is available on Informatics DICE systems - either run <code>matlab -desktop</code> from a terminal or select MATLAB from the applications menu.</p></li>
+</ul>
+
+<p>The data has been provided in formats which are easy to load in Python and MATLAB, however other languages may also support loading these formats. For example the statistics oriented language <a href="https://cran.r-project.org/web/packages/R.matlab/R.matlab.pdf">R</a> has a package <a href="https://cran.r-project.org/web/packages/R.matlab/R.matlab.pdf"><code>R.matlab</code></a> which can be used to load <code>.mat</code> files.</p>
+
+
+
+<h2 id="loading-the-data">Loading the data</h2>
+
+
+
+<h3 id="python-numpy">Python + Numpy</h3>
+
+<p>The <code>.npz</code> files can be loaded using the <code>numpy.load</code> function. This returns a dictionary-like object with the variable names acting as the keys. So for example starting a <code>python</code> interpreter in the same directory as the data files and running</p>
+
+
+
+<pre class="prettyprint"><code class="language-python hljs "><span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np
+diag_covar = np.load(<span class="hljs-string">'diag_covar.npz'</span>)</code></pre>
+
+<p>will mean <code>diag_covar</code> is now a dictionary-like object which can be used to access the approximation density variables. For instance</p>
+
+
+
+<pre class="prettyprint"><code class="language-python hljs ">print(diag_covar[<span class="hljs-string">'approx_mean'</span>])</code></pre>
+
+<p>will print the approximation density mean vector to the interpreter output.</p>
+
+<p>If you wish to load all of the variables in the loaded dictionary-like object in to the global namespace you can use</p>
+
+
+
+<pre class="prettyprint"><code class="language-python hljs ">globals().update(diag_covar)</code></pre>
+
+<p>At which point you will be able to then directly use variable names e.g.</p>
+
+
+
+<pre class="prettyprint"><code class="language-python hljs ">print(approx_mean)</code></pre>
+
+<p>A more complete example of loading the data and performing some operations with it is given below.</p>
+
+
+
+<pre class="prettyprint"><code class="language-python hljs "><span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np
+<span class="hljs-keyword">import</span> scipy.stats <span class="hljs-keyword">as</span> stats
+
+<span class="hljs-comment"># create pseudo-random number generator object</span>
+seed = <span class="hljs-number">1234</span>
+prng = np.random.RandomState(seed)
+
+<span class="hljs-comment"># load data file (np.load returns dict like object)</span>
+diag_covar = np.load(<span class="hljs-string">'diag_covar.npz'</span>)
+
+<span class="hljs-comment"># extract some of variables from loaded dict</span>
+approx_mean = diag_covar[<span class="hljs-string">'approx_mean'</span>]
+approx_covar = diag_covar[<span class="hljs-string">'approx_covar'</span>]  <span class="hljs-comment"># vector for diag_covar</span>
+n_players = diag_covar[<span class="hljs-string">'n_players'</span>]
+
+<span class="hljs-comment"># draw a random skill sample from Gaussian posterior approximation</span>
+skill_sample = (approx_mean + 
+                prng.normal(size=n_players) * approx_covar**<span class="hljs-number">0.5</span>)
+
+<span class="hljs-comment"># calculate log probability density at sample point</span>
+log_pdf_sample = stats.multivariate_normal.logpdf(
+    skill_sample, approx_mean, approx_covar)</code></pre>
+
+
+
+<h3 id="matlab">MATLAB</h3>
+
+<p>The <code>.mat</code> files can be loaded using the inbuilt <code>load</code> function. This populates the current workspace with the variables stored in the data file. In a MATLAB command window with the current directory set to the directory the extracted data files are in, running</p>
+
+
+
+<pre class="prettyprint"><code class="language-matlab hljs ">load(<span class="hljs-string">'diag_covar.mat'</span>)</code></pre>
+
+<p>will load all of the variables in the data file into the workspace. Alternatively <code>.mat</code> data files can be loaded using the MATLAB <em>Open File</em> dialog.</p>
+
+<p>The following will perform a roughly equivalent set of operations to the Python example above.</p>
+
+
+
+<pre class="prettyprint"><code class="language-matlab hljs "><span class="hljs-comment">% load data file objects in to workspace</span>
+load(<span class="hljs-string">'diag_covar.mat'</span>)
+
+<span class="hljs-comment">% draw a random skill sample from Gaussian posterior </span>
+skill_sample = approx_mean + <span class="hljs-built_in">randn</span>(<span class="hljs-number">1</span>, n_players) .* <span class="hljs-transposed_variable">approx_covar.</span>^<span class="hljs-number">0.5</span>;
+
+<span class="hljs-comment">% calculate log probability density at sample point</span>
+pdf_sample = mvnpdf(skill_sample, approx_mean, approx_covar);
+log_pdf_sample = <span class="hljs-built_in">log</span>(pdf_sample);</code></pre></div></body>
+</html>
