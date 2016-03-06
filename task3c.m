@@ -2,7 +2,7 @@ function [] = task3c()
 %TASK3C Calculate the probability of AlphaGo winning, when playing as black
 %using both diagonal and full covariance matrices
 
-    format long;
+    format long
     
     load('go_player_skill_model/diag_covar.mat');
     
