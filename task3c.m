@@ -24,7 +24,7 @@ function [] = task3c()
     
     eq_diag = numerator / denominator_diag;
     
-    disp(['Using diag cov: ',num2str(normcdf(eq_diag))]);
+    disp(['P(r=1|s_b=',num2str(alpha_go_id), ',s_w=',num2str(lee_sedol_id),',approx=diag)=',num2str(normcdf(eq_diag))]);
     
     load('go_player_skill_model/full_covar.mat');
     
@@ -34,7 +34,7 @@ function [] = task3c()
     
     eq_full = numerator_full / denominator_full;
     
-    disp(['Using full cov: ',num2str(normcdf(eq_full))]);
+    disp(['P(r=1|s_b=',num2str(alpha_go_id), ',s_w=',num2str(lee_sedol_id),',approx=full)=',num2str(normcdf(eq_full))]);
     
 end
 
