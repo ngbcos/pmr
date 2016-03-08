@@ -711,6 +711,7 @@ The above result is derived for one game. Based on Section~\ref{sec:1d}, I assum
 \end{equation}
 
 \subsection{}
+\label{sec:2f}
 
 Adopting Bayes Rule, we can rewrite the equation in the following fashion:
 
@@ -968,14 +969,14 @@ These posterior marginals (solid lines in Figure~\ref{fig:black_predicted_wins} 
 
 \begin{figure}[htpb!]
     \centering
-    \includegraphics[scale=0.5]{3b_diag}
+    \includegraphics[scale=0.9]{3b_diag}
     \caption{Approximate posterior marginal distributions for AlphaGo, Fan Hui, Lee Sedol using diagonal covariance approximation.}
     \label{fig:3b_diag}
 \end{figure}
 
 \begin{figure}[htpb!]
     \centering
-    \includegraphics[scale=0.5]{3b_full}
+    \includegraphics[scale=0.9]{3b_full}
     \caption{Approximate posterior marginal distributions for AlphaGo, Fan Hui, Lee Sedol using full covariance approximation.}
     \label{fig:3b_full}
 \end{figure}
@@ -993,13 +994,13 @@ function [] = task3b()
     figure(1);
     hold on;
     title('Diagonal covariance matrix');
-    plot(x, normpdf(x, approx_mean(lee_sedol_id), approx_covar(lee_sedol_id)),'-r');
-    plot(x, normpdf(x, approx_mean(fan_hui_id), approx_covar(fan_hui_id)),'--g');
-    plot(x, normpdf(x, approx_mean(alpha_go_id), approx_covar(alpha_go_id)),'-.b');
-    ylim([0 1.6]);
+    plot(x, normpdf(x, approx_mean(lee_sedol_id), approx_covar(lee_sedol_id)^0.5),'-r');
+    plot(x, normpdf(x, approx_mean(fan_hui_id), approx_covar(fan_hui_id)^0.5),'--g');
+    plot(x, normpdf(x, approx_mean(alpha_go_id), approx_covar(alpha_go_id)^0.5),'-.b');
+    ylim([0 9]);
     legend('Lee Sedol','Fan Hui', 'AlphaGo', 'Location', 'northwest');
-    xlabel('Position along line s');
-    ylabel('Value of factor at s=s(x^{(k)T}x^{(k)})^{-1}x^{(k)}');
+    xlabel('Skill');
+    ylabel('P(Skill)');
     hold off;
     
     load('go_player_skill_model/full_covar.mat');
@@ -1007,26 +1008,27 @@ function [] = task3b()
     figure(2);
     hold on;
     title('Full covariance matrix');
-    plot(x, normpdf(x, approx_mean(lee_sedol_id), approx_covar(lee_sedol_id,lee_sedol_id)),'-r');
-    plot(x, normpdf(x, approx_mean(fan_hui_id), approx_covar(fan_hui_id,fan_hui_id)),'--g');
-    plot(x, normpdf(x, approx_mean(alpha_go_id), approx_covar(alpha_go_id,alpha_go_id)),'-.b');
-    ylim([0 1.6]);
+    plot(x, normpdf(x, approx_mean(lee_sedol_id), approx_covar(lee_sedol_id,lee_sedol_id)^0.5),'-r');
+    plot(x, normpdf(x, approx_mean(fan_hui_id), approx_covar(fan_hui_id,fan_hui_id)^0.5),'--g');
+    plot(x, normpdf(x, approx_mean(alpha_go_id), approx_covar(alpha_go_id,alpha_go_id)^0.5),'-.b');
+    ylim([0 9]);
     legend('Lee Sedol','Fan Hui', 'AlphaGo', 'Location', 'northwest');
-    xlabel('Position along line s');
-    ylabel('Value of factor at s=s(x^{(k)T}x^{(k)})^{-1}x^{(k)}');
+    xlabel('Skill');
+    ylabel('P(Skill)');
     hold off;
     drawnow;
 end
 
 \end{lstlisting}
 
-Firstly, please note that the graph is "cut", in order to create a better representation of the comparison between players' skills. It is cut because Lee Sedol's skill distribution goes up to approximately 120, making the other two look insignificant. Distributions clearly show that the skill of the two "real" players - Lee Sedol and Fan Hui is well defined, as their variance using both full and diagonal approximation is way smaller, than the variance of AlphaGo. This can be explained by the fact that the two players have played more games than AlphaGo has.
+Distributions clearly show that the skill of the two "real" players - Lee Sedol and Fan Hui is well defined, as their variance using both full and diagonal approximation is way smaller, than the variance of AlphaGo. This can be explained by the fact that the two players have played more games than AlphaGo has.
 
-Furthermore, it is interesting to see the difference between using the diagonal and full approximations with respect to the variance. For example, Fan Hui's variance when using the full approximation is larger than when using diagonal approximation. Same goes for Lee Sedol. Whereas, AlphaGo's variance behaves differently - it's lower for the full covariance matrix. Logically, this can be explained by the fact that the full covariance matrix contains more information, i.e. the covariance with respect to the other 1048 players, whereas the diagonal approximation only involves the variance.
+Furthermore, it is interesting to see the difference between using the diagonal and full approximations with respect to the variance. For example, Fan Hui's variance when using the full approximation is larger than when using diagonal approximation. Same goes for Lee Sedol. Whereas, AlphaGo's variance behaves differently - it's lower for the full covariance matrix. Logically, this can be explained by the fact that the full covariance matrix contains more information, i.e. the covariance with respect to the other 1048 players, whereas the diagonal approximation only involves the variance. While this is partially true, there are more factors that have to be taken into account. Firstly, the full covariance matrix doesn't mean that each player played against each other, even though, the entries are non-zero. The reason for this is the inverse of the covariance matrix. Furthermore, the difference between the variance between Fan Hui and AlphaGo is very small, it can be considered as insignificant.
 
-Finally, one can notice that there is a shift of the mean for all 3 players. When using the diagonal approximation one can see that Lee Sedol and AlphaGo's skill mean are quite close, even though, their uncertainty level is very different. When using the full covariance matrix, however, we can clearly see, that Lee Sedol's skill is better defined in terms of the graph presented on Figure~\ref{fig:3b_full}.
+Finally, one can notice that there is a shift of the mean for all 3 players. When using the diagonal approximation one can see that Lee Sedol's and AlphaGo's skill mean are quite close, even though, their uncertainty level is very different. When using the full covariance matrix, however, we can clearly see, that Lee Sedol's skill is better defined in terms of the graph presented on Figure~\ref{fig:3b_full}. In addition, the skill mean of Lee Sedol is clearly above AlphaGo's one when using the full covariance matrix.
 
 \subsection{}
+
 \begin{equation}
     P(r=1|s_b=1049,s_w=26,approx=diag)=0.52726
     \label{eq:ag_vs_ls_diag}
@@ -1077,7 +1079,10 @@ end
 \end{lstlisting}
 
 \subsection{}
-Considering the two results in Equation~\ref{eq:ag_vs_ls_diag} and~\ref{eq:ag_vs_ls_full}, as well as the two graphs in Figure~\ref{fig:3b_full} and~\ref{fig:3b_diag}, one could argue that the results are reasonable. However, as previously mentioned in Section~\ref{sec:3c}, the full covariance matrix is more informative, as it has the covariances between the rest of the players. Moreover, one can see from the comparison between Figure~\ref{fig:diag_from_orig} and~\ref{fig:full_from_orig} that using the full covariance matrix better approximates the true factor. From the approximate factor fit on both graphs one could see that the full approximation (Figure~\ref{fig:full_from_orig}) fits better the true factor. Particularly around $(x,y)=(0.5,0.9)$. Thus, I believe that the full covariance matrix is more accurate when compared to the diagonal matrix. 
+Considering the two results in Equation~\ref{eq:ag_vs_ls_diag} and~\ref{eq:ag_vs_ls_full}, as well as the two graphs in Figure~\ref{fig:3b_full} and~\ref{fig:3b_diag}, one could argue that the results are expected. Meaning that when using the diagonal covariance matrix, where the mean of Lee Sedol and Alpha Go is quite close, AlphaGo has 52.726\% of winning. When using the full covariance matrix, one could also observe that as the distributions are further apart, with Lee Sedol's PDF having advantage, it is reasonable to assume that AlphaGo has a lower chance of winning - 36.533\%.
+
+However, as previously mentioned in Section~\ref{sec:3c}, the full covariance matrix is more informative, as it has the covariances between the rest of the players. In other words it takes into account the previously played games between players when computing the marginal posterior. Having said that, the accuracy of the estimated posterior might be hard to evaluate. The reason is that the skill of a player is something not actually observable, but can be regarded as hidden variable. Thus, it would take lots of trial and error in order to determine whether the approximation is correct or not. These experiments would have to be based on observations of game outcomes.
+This can be confirmed by the fact that on both Figure~\ref{fig:diag_from_orig} and~\ref{fig:full_from_orig} the diagonal and full covariance matrix approximate the true factor almost identically.
 
 \begin{figure}[htpb!]
     \centering
@@ -1086,7 +1091,102 @@ Considering the two results in Equation~\ref{eq:ag_vs_ls_diag} and~\ref{eq:ag_vs
     \label{fig:full_from_orig}
 \end{figure}
 
-On the other hand, if we have to consider millions of Go players, then the full matrix computation will become very inefficient. Whereas, considering only the main diagonal can save a considerable amount of time. In fact, when adopting the full covariance approximation approach, an extra complexity of $\mathcal{O}(K^3N^3)$ is added~\cite{scholkopf2007advances}. When using the diagonal matrix, however, we lose the "explicit posterior coupling"~\cite{scholkopf2007advances}.
+On the other hand, if we have to consider millions of Go players, then the full matrix computation will become very inefficient, as it is computationally expensive to inverse the full covariance matrix. Whereas, inversing the main diagonal of a matrix is essentially inversing a vector, which will take linear time. In fact, Sch{\"o}lkopf et al argue that adopting the full covariance approximation approach, an extra complexity of $\mathcal{O}(K^3N^3)$ is added~\cite{scholkopf2007advances}. Furthermore, they show that when using the diagonal matrix, we lose the "explicit posterior coupling"~\cite{scholkopf2007advances}.
+
+\section{}
+
+\subsection{}
+As shown in Section~\ref{sec:2f}, when computing the Cumulative Density Function, the model considers only the pure skill of the player. A possible extension of the model would be to add an additional constant that would account for the disadvantage of playing with the white stones. This extension, $komi$, however, needs to be weighted, based on the difference in the skills of the two players. For example, consider two games, in the first one $s_w^1$ plays $s_b^2$, and the difference between them is 2000, and in the second game $s_b^1$ plays $s_w^3$, where the skill difference is only 10. If a constant $komi$ is added to the CDF calculation, then it might result in very different approximations. This weighted factor, by which the $komi$ should be weighted might be hard to compute, as it would involve numerous observations of game outcomes. Mathematically this extension can be expressed as follows:
+
+\begin{equation}
+    \Phi \Big[ \frac{s_b - s_w}{\sqrt{2}\beta} + \frac{K}{K_{factor}} \Big]
+\end{equation}
+
+A similar implementation was considered in~\cite{stanescu2011rating}, with the slight difference of accounting for handicapped games. In my opinion, accounting for the extension would shift the approximation of the CDF towards the skill of the white player, in order to compensate for the advantage of starting first. This will eventually result in more accurate calculations of the approximate posteriors for the skills of both players.
+
+\subsection{WRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEME}
+In the model so far, we have assumed that the player skill will be fixed, even though we are trying to approximate it, we do not allow it to change dynamically over time. Such situations might happen, when for example, a player has a "bad" day, when he is not performing up to his usual standards, for instance. In order to model this, we can extend the model to account for skill at any given time $t \in \{1..T\}$, such that, $p(s^t|s^{t-1})=\mathcal{N}(0, s_{change})$. In other words, the skill changes through time, where that change is modelled with a zero-mean Gaussian. This means that the skill varies from game to game and on average it does not vary much, i.e. $\mu_{change}=0$. Therefore, our skill posterior will be updated as follows~\cite{bishop2013model}:
+
+\begin{equation}
+    \label{eq:4b_bishop}
+    s^t = s^{t-1}+s_{change} = \mathcal{N}(s^t;\mu_{s^{t-e}}, \Var(s_{change}))
+\end{equation}
+
+Therefore, the updated factor graph for 2 consecutive games between 2 paired players would look like so:
+
+\begin{figure}[htpb!]
+    \centering
+    \tikz{ %
+        \node[obs] (r1) {$r^{(1)}$} ; %
+        \node[latent, left=of r1, yshift=0.9cm, xshift=-0.7cm] (pw) {$p^{t-1}_w$} ; %
+        \node[latent, left=of r1, below=of pw] (pb) {$p^{t-1}_b$} ; %
+        \factor[left=of r1, xshift=-0.2cm] {r1-factor} {} {} {};
+        \edge {pw,pb} {r1-factor} ; %
+        \edge {r1-factor} {r1}; %
+        \factor[left=of pw, xshift=-.6cm] {pw-factor} {below:$\mathcal{N}(p^{t-1}_w;s^{t-1}_w,\beta^2)$} {} {};
+        \factor[left=of pb, xshift=-.6cm] {pb-factor} {above:$\mathcal{N}(p^{t-1}_b;s^{t-1}_b,\beta^2)$} {} {};
+        \node[latent, left=of pw, xshift=-1.2cm] (sw) {$s^{t-1}_w$} ; %
+        \node[latent, left=of pb, xshift=-1.2cm] (sb) {$s^{t-1}_b$} ; %
+        \edge {sw} {pw-factor} ; %
+        \edge {sb} {pb-factor} ; %
+        \edge {pw-factor} {pw} ; %
+        \edge {pb-factor} {pb} ; %
+        \factor[left=of sw, xshift=-1.2cm] {sw-factor} {left:$\mathcal{N}(s^{t-1}_w;0,\sigma^2)$} {} {};
+        \factor[left=of sb, xshift=-1.2cm] {sb-factor} {left:$\mathcal{N}(s^{t-1}_b;0,\sigma^2)$} {} {};
+        \edge {sw-factor} {sw} ; %
+        \edge {sb-factor} {sb} ; %
+        \node[const, left=of r1-factor, xshift=-3cm]  (beta) {$\beta$} ; %
+        \node[const, left=of beta, xshift=-2cm]  (alpha) {$\alpha$} ; %
+        \edge[dotted] {beta} {pb-factor} ; %
+        \edge[dotted] {beta} {pw-factor} ; %
+        \edge[dotted] {alpha} {sb-factor} ; %
+        \edge[dotted] {alpha} {sw-factor} ; %
+        %\draw node [above=of alpha, fill=white, xshift=2cm] {\textcolor{red}{(1)}};
+        %\draw node [above=of alpha, fill=white, xshift=3.9cm] {\textcolor{red}{(2)}};
+        %\draw node [above=of alpha, fill=white, xshift=5.1cm] {\textcolor{red}{(3)}};
+        %\draw node [above=of alpha, fill=white, xshift=7cm, yshift=-0.5cm] {\textcolor{red}{(4)}};
+        %\draw node [above=of alpha, fill=white, xshift=7.7cm, yshift=-1cm] {\textcolor{red}{(5)}};
+        %\draw node [above=of alpha, fill=white, xshift=7cm, yshift=-2.3cm] {\textcolor{blue}{(6)}};
+        %\draw node [above=of alpha, fill=white, xshift=5.1cm, yshift=-2.7cm] {\textcolor{blue}{(7)}};
+        %\draw node [above=of alpha, fill=white, xshift=3.9cm, yshift=-2.7cm] {\textcolor{blue}{(8)}};
+        %\draw node [above=of alpha, fill=white, xshift=2cm, yshift=-2.7cm] {\textcolor{red}{(9)}};
+        
+        % second game
+        \node[obs, below=of r1, yshift=-2cm] (r2) {$r^{(2)}$} ; %
+        \node[latent, left=of r2, yshift=0.9cm, xshift=-0.7cm] (pw2) {$p^{t}_w$} ; %
+        \node[latent, left=of r2, below=of pw2] (pb2) {$p^{t}_b$} ; %
+        \factor[left=of r2, xshift=-0.2cm] {r2-factor} {} {} {};
+        \edge {pw2,pb2} {r2-factor} ; %
+        \edge {r2-factor} {r2}; %
+        \factor[left=of pw2, xshift=-.6cm] {pw2-factor} {below:$\mathcal{N}(p^t_w;s^t_w,\beta^2)$} {} {};
+        \factor[left=of pb2, xshift=-.6cm] {pb2-factor} {above:$\mathcal{N}(p^t_b;s^t_b,\beta^2)$} {} {};
+        \node[latent, left=of pw2, xshift=-1.2cm] (sw2) {$s^{t-1}_w$} ; %
+        \node[latent, left=of pb2, xshift=-1.2cm] (sb2) {$s^{t-1}_b$} ; %
+        \edge {sw2} {pw2-factor} ; %
+        \edge {sb2} {pb2-factor} ; %
+        \edge {pw2-factor} {pw2} ; %
+        \edge {pb2-factor} {pb2} ; %
+        \factor[left=of sw2, xshift=-1.2cm, yshift=1cm] {sw2-factor} {left:$\mathcal{N}(s^t_w;0,s^2_{change})$} {} {};
+        \factor[left=of sb2, xshift=-1.2cm, yshift=1cm] {sb2-factor} {left:$\mathcal{N}(s^t_b;0,s^2_{change})$} {} {};
+        \edge {sw} {sw2-factor} ; %
+        \edge {sb} {sb2-factor} ; %
+        \edge {sw2-factor} {sw2}; %
+        \edge {sb2-factor} {sb2}; %
+        \node[const, left=of r2-factor, xshift=-3cm]  (beta2) {$\beta$} ; %
+        \edge[dotted] {beta2} {pb2-factor} ; %
+        \edge[dotted] {beta2} {pw2-factor} ; %
+        \edge[dotted] {alpha} {sw-factor} ; %
+    }
+    \caption{Factor graph of Gaussian player skill model for a two consecutive games between 2 paired players. 
+    The variables $r^{(1)}$, $s_b$ and $s_w$ are as defined for Figure~\ref{fig:fg}. The variables $p_b$ and $p_w$ are the performances of the black and white player respectively in the game. The red edges are the original messages, where as the blue edges are the approximated ones for each individual factor locally.}
+    \label{fig:skill_var_time}
+\end{figure}
+
+The suggestion is from bishop MBML book.
+
+Alternatively to this approach, TTT{CITEMECITEMECITEMECITEMECITEMECITEMECITEMECITEMECITEMECITEMECITEMECITEMECITEMECITEMECITEMECITEMECITEMECITEME} suggests a method that essentially overcomes the ordering and update through time issues. Give example of a player playing with another player that is very strong and then how it propagates back and forth in time.
+
+\subsection{WRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEME}
 
 \clearpage
 
