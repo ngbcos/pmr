@@ -201,6 +201,7 @@ There are no conditional independence statements between the variables $s_1$, $s
 In other words, the games are only dependent on the players that play them.
 
 \section{Question 2: Gaussian player skill model}
+\label{sec:2}
 \subsection{}
 From the figure, one can express the joint probability distribution as follows:
 
@@ -806,6 +807,7 @@ Substituting the likelihood, Equation~\ref{eq:r_iid_6}, in Equation~\ref{eq:2_f_
 \end{equation}
 
 \section{Approximate inference with Go game data}
+\label{sec:3}
 
 \subsection{}
 In order to interpret the graphs, I will firstly illustrate the process of expectation propagation with messages, passing through the graph, given in Figure 2 of the assignment sheet, which copy is presented at Figure~\ref{fig:fig_2_assignment}. There, the flow of messages for only one game of Go are shown and are labelled in red and blue. Further, I will associate some of the messages with the different plots and explain what they represent.
@@ -1104,7 +1106,7 @@ As shown in Section~\ref{sec:2f}, when computing the Cumulative Density Function
 
 A similar implementation was considered in~\cite{stanescu2011rating}, with the slight difference of accounting for handicapped games. In my opinion, accounting for the extension would shift the approximation of the CDF towards the skill of the white player, in order to compensate for the advantage of starting first. This will eventually result in more accurate calculations of the approximate posteriors for the skills of both players.
 
-\subsection{WRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEME}
+\subsection{}
 In the model so far, we have assumed that the player skill will be fixed, even though we are trying to approximate it, we do not allow it to change dynamically over time. Such situations might happen, when for example, a player has a "bad" day, when he is not performing up to his usual standards, for instance. In order to model this, we can extend the model to account for skill at any given time $t \in \{1..T\}$, such that, $p(s^t|s^{t-1})=\mathcal{N}(0, s_{change})$. In other words, the skill changes through time, where that change is modelled with a zero-mean Gaussian. This means that the skill varies from game to game and on average it does not vary much, i.e. $\mu_{change}=0$. Therefore, our skill posterior will be updated as follows~\cite{bishop2013model}:
 
 \begin{equation}
@@ -1168,25 +1170,44 @@ Therefore, the updated factor graph for 2 consecutive games between 2 paired pla
         \edge {pb2-factor} {pb2} ; %
         \factor[left=of sw2, xshift=-1.2cm, yshift=1cm] {sw2-factor} {left:$\mathcal{N}(s^t_w;0,s^2_{change})$} {} {};
         \factor[left=of sb2, xshift=-1.2cm, yshift=1cm] {sb2-factor} {left:$\mathcal{N}(s^t_b;0,s^2_{change})$} {} {};
-        \edge {sw} {sw2-factor} ; %
-        \edge {sb} {sb2-factor} ; %
-        \edge {sw2-factor} {sw2}; %
-        \edge {sb2-factor} {sb2}; %
+        \edge[color=blue] {sw} {sw2-factor} ; %
+        \edge[color=blue] {sb} {sb2-factor} ; %
+        \edge[color=blue] {sw2-factor} {sw2}; %
+        \edge[color=blue] {sb2-factor} {sb2}; %
         \node[const, left=of r2-factor, xshift=-3cm]  (beta2) {$\beta$} ; %
         \edge[dotted] {beta2} {pb2-factor} ; %
         \edge[dotted] {beta2} {pw2-factor} ; %
         \edge[dotted] {alpha} {sw-factor} ; %
     }
-    \caption{Factor graph of Gaussian player skill model for a two consecutive games between 2 paired players. 
-    The variables $r^{(1)}$, $s_b$ and $s_w$ are as defined for Figure~\ref{fig:fg}. The variables $p_b$ and $p_w$ are the performances of the black and white player respectively in the game. The red edges are the original messages, where as the blue edges are the approximated ones for each individual factor locally.}
+    \caption{Factor graph of Gaussian player skill model for a two consecutive games between 2 paired players. The variables used are similar to the ones in Figure~\ref{fig:fig_2_assignment}, with the difference of the time step $t \in \{1..T\}$. In addition the figure presents a model that accounts for the change of skill between games by introducing a two new factors ($\mathcal{N}(s^t_w;0,s^2_{change})$ and $\mathcal{N}(s^t_b;0,s^2_{change})$). They act as the new prior in the following game, introducing more uncertainty between games.}
     \label{fig:skill_var_time}
 \end{figure}
 
-The suggestion is from bishop MBML book.
+In~\cite{bishop2013model}, Winn and Bishop suggest that we firstly run expectation propagation in the game with outcome $r^{(1)}$. Then, the outgoing messages, from $s^{t-1}_w$ and $s^{t-1}_w$ to $s^{t}_w$ and $s^{t}_w$, are updated skill distributions that pass through the new Gaussian Factors. However, when convoluting these messages with the Gaussian factor (for example $\mathcal{N}(s^t_w;0,s^2_{change})$), essentially, we are introducing more uncertainty between games. This convolution is then used as the new prior for the next game. While introducing more uncertainty with every game may not be intuitive, it allows us to model the skill change of a player through time. Essentially, this new model allows to reflect the possibility of a change in players' skill.
 
-Alternatively to this approach, TTT{CITEMECITEMECITEMECITEMECITEMECITEMECITEMECITEMECITEMECITEMECITEMECITEMECITEMECITEMECITEMECITEMECITEMECITEME} suggests a method that essentially overcomes the ordering and update through time issues. Give example of a player playing with another player that is very strong and then how it propagates back and forth in time.
+Figure~\ref{fig:mbml_dynamic_skill_update} shows the improvement made by Winn and Bishop using this model over the previous one. The red line denotes the true skill change, the blue line shows the inferred skill change under the original model used in Section~\ref{sec:2} and~\ref{sec:3}. The green curve shows the updated model's inference, supporting the change of skill over time.
+
+\begin{figure}[htpb!]
+    \centering
+    \includegraphics[scale=1]{TrueSkill_DynamicsDemo_Trajectories[2]}
+    \caption{Figure adopted from~\cite{bishop2013model}. Elliot is the player who skill is being modelled. Red line denotes the true skill change, blue line shows the inferred skill change under the original model (Figure~\ref{fig:fig_2_assignment}), green curve shows the updated model's inference, supporting the change of skill over time.}
+    \label{fig:mbml_dynamic_skill_update}
+\end{figure}
+
+This approach has several drawbacks - it depends on the order of the update, as well as it does not account for the very old games~\cite{dangauthier2007trueskill}. For instance, on Figure~\ref{fig:mbml_dynamic_skill_update}, if the first 200 games are played 2 years ago, then the model might not be relevant, as other factors could potentially influence players' skill. The second drawback is that inference is only propagated forward in time~\cite{dangauthier2007trueskill}. For example, if player A plays an unseen opponent B and wins, but this opponent turns out to be very good, then the skill of player A is not properly adjusted.
+
+An alternative, suggested by Dangauthier et al is to use a method called TrueSkill Through Time (TTT)~\cite{dangauthier2007trueskill}. Their improvement can be partially applied to the aforementioned model. A significant change would be to track the game outcomes based on different years. For example, $r^{(1)}$ and $r^{(2)}$ will become $r^{y(1)}$ and $r^{y(2)}$ to relate them to games in the same time period (years in this case). This is described as the Vanilla TrueSkill in~\cite{dangauthier2007trueskill}. In order to improve this Vanilla TrueSkill, we have to run the full EP algorithm until convergence for a certain time period ($y$). An important note is that the previous update of the result of a game must be removed before the new one is applied. Thus, the model is consistent, but less approximate~\cite{dangauthier2007trueskill}.
 
 \subsection{WRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEME}
+In Section~\ref{sec:3}, the expectation propagation inference method is used, that allow intractable distributions to be approximated by Gaussians, it is considered to be the generalisation of loopy belief propagation. In Section~\ref{sec:3}, it is shown how from a normal CDF, we can approximate a Gaussian distribution and use that instead, in order to have a conjugate prior - Gaussian.
+
+A clear disadvantage of EP is that it might not converge~\ref{bishop2006pattern}. However, this is not the case for our model, thus it will not be discussed in detail. Another drawback of EP is that
+
+when evaluating the big integral, the first term is relatively easy to compute, whereas the second term could be very computationally expensive. Thus, one could use the alternative of Gibbs sampling for that case.
+
+Alternatively, one could use variational approximation 
+
+Note that we can compute r|sb,sw easily, but we can use gibbs sampling for the other term.
 
 \clearpage
 
