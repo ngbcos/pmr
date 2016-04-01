@@ -119,11 +119,11 @@ bindingoffset=0mm, top=20mm,bottom=20mm}
 
 \author{Georgi Tinchev, s1549117, The University of Edinburgh}
 
-\date{07/03/2016}
+\date{08/03/2016}
 
 \maketitle
 
-\section{Question 1: Player skill graphical models}
+\section{Player skill graphical models}
 
 
 \subsection{}
@@ -131,14 +131,14 @@ bindingoffset=0mm, top=20mm,bottom=20mm}
 \begin{figure}[htpb!]
     \centering
     \tikz{ %
-        \node[obs] (r1) {$r^1$} ; %
+        \node[obs] (r1) {$r^{(1)}$} ; %
         \node[latent, above=of r1, yshift=0.5cm, xshift=-1cm] (s1) {$s_1$} ; %
         \node[latent, above=of r1, yshift=0.5cm, xshift=0.7cm] (s2) {$s_2$} ; %
-        \node[obs, xshift=1.5cm] (r2) {$r^2$};
+        \node[obs, xshift=1.5cm] (r2) {$r^{(2)}$};
         \node[latent, right=of s2] (s3) {$s_3$};
         \factor[above=of r1, yshift=0.2cm] {r1-factor} {$\mathcal{\eta}$} {} {};
         \factor[above=of r2, yshift=0.2cm] {r2-factor} {$\mathcal{\mu}$} {} {};
-        \node[obs, yshift=4.5cm, xshift=0.7cm] (r3) {$r^3$};
+        \node[obs, yshift=4.5cm, xshift=0.7cm] (r3) {$r^{(3)}$};
         \factor[below=of r3, yshift=-0.4cm, xshift=0cm] {r3-factor} {$\mathcal{\phi}$} {} {};
         \edge {s1,s2} {r1-factor} ; %
         \edge{s2,s3} {r2-factor};
@@ -152,11 +152,11 @@ bindingoffset=0mm, top=20mm,bottom=20mm}
 \end{figure}
       
 \subsection{}
-\subsubsection{$I(s_1,s_2|r^{(2)})$}
+\subsubsection{$I(s_1,s_2|r^{(2)})\checkmark$} 
 \label{sec:first_indep}
 There are 2 paths leading from $s_1$ to $s_2$, namely $s_1-\eta-s_2$ and $s_1-\phi-s_3-\mu-s_2$. The former path is blocked, as $\eta$ has two incoming edges and neither $\eta$, nor $r^{(1)}$ (being all descendants) are in the conditioning set (being $r^{(2)}$). The latter is also blocked, but the case is slightly more complicated. Firstly, $\mu$ has two incoming edges, however, its descendant is in the conditioning set ($r^{(2)}$), therefore, the path is not blocked there. Secondly, $\phi$ also has two incoming edges and neither $\phi$, nor $r^{(3)}$ are in the conditioning set, therefore, the path is blocked there.
 Thus, as the two paths are blocked $=> I(s_1,s_2|r^{(2)})$.
-\subsubsection{$I(s_1,s_2|r^{(2)},r^{(3)})$}
+\subsubsection{$I(s_1,s_2|r^{(2)},r^{(3)})\times$}
 As identified in Section~\ref{sec:first_indep}, there are 2 paths. The path $s_1-\eta-s_2$ is still blocked, as $\eta$, nor any of its descendants are in the conditioning set. The path $s_1-\phi-s_3-\mu-s_2$, however, is now unblocked, as for all factors and variables with 2 incoming edges, there is a child that belongs to the conditioning set, namely $r^{(3)}$ is a child of $\phi$ and $r^{(2)}$ is a child of $\mu$, both of them being in the conditioning set. Therefore, $s_1,s_2$ are conditionally dependent on the set $\{r^{(2)},r^{(3)}\}$.
 \subsection{}
 \begin{figure}[htpb!]
@@ -182,7 +182,7 @@ As identified in Section~\ref{sec:first_indep}, there are 2 paths. The path $s_1
 \subsection{}
 \label{sec:1d}
 
-In order to avoid repetition I will use two indices, namely, $i$, $j$, $k$, where $i \neq j \neq k$. Equation~\ref{eq:ci_1d} and~\ref{eq:ci_1d_2} generalise the conditional independence statements in Figure~\ref{fig:mn}. Also, the following rules must hold: $s_i, s_j \in ne(r^{(i)}) || s_i, s_j \in ne(r^{(j)})$ for Equation~\ref{eq:ci_1d} and $s_i, s_j \in ne(r^{(i)})$ for Equation~\ref{eq:ci_1d_2}.
+In order to avoid repetition I will use the indices $i$, $j$, $k$, where $i \neq j \neq k$. Equation~\ref{eq:ci_1d} and~\ref{eq:ci_1d_2} generalise the conditional independence statements in Figure~\ref{fig:mn}. Also, the following rules must hold: $s_i, s_j \in ne(r^{(i)}) || s_i, s_j \in ne(r^{(j)})$ for Equation~\ref{eq:ci_1d} and $s_i, s_j \in ne(r^{(i)})$ for Equation~\ref{eq:ci_1d_2}.
 
 \begin{equation}
     \label{eq:ci_1d}
@@ -608,7 +608,7 @@ Now we can express $p(p_b,p_w|s_b,s_w)$ as $p(\theta,\psi|s_b,s_w)$, when substi
 \end{equation}
 
 \subsection{}
-We can express the inequality $p(r=1|p_b,p_w)$ as follows:
+We can express $\mathbb{P}(r=1|p_b,p_w)$ as the inequality:
 \begin{equation}
     \label{int_p_w_p_b_0}
     \mathbb{1}[p_b > p_w]
@@ -644,25 +644,25 @@ Using the change of variable from Equation~\ref{p_b_in_p_w_2} and~\ref{p_w_in_p_
 \subsection{}
 
 \begin{equation}
-    \mathbb{P}(r=1|s_b,s_w) = \frac{\mathbb{P}(r=1,s_b,s_w)}{\mathbb{P}(s_b,s_w)}
+    \mathbb{P}(r=1|s_b,s_w) = \frac{\mathbb{p}(r=1,s_b,s_w)}{\mathbb{p}(s_b,s_w)}
 \end{equation}
 
 \begin{equation}
-    \mathbb{P}(r=1|s_b,s_w) = \frac{\int_{\theta,\psi} \mathbb{P}(r=1,\theta,\psi,s_b,s_w)\diff{\theta}\diff{\psi}}{\mathbb{P}(s_b,s_w)}
+    \mathbb{P}(r=1|s_b,s_w) = \frac{\int_{\theta,\psi} \mathbb{P}(r=1,\theta,\psi,s_b,s_w)\diff{\theta}\diff{\psi}}{\mathbb{p}(s_b,s_w)}
 \end{equation}
 
 \begin{equation}
-    \mathbb{P}(r=1|s_b,s_w) = \frac{\int_{\theta,\psi} \mathbb{P}(r=1|\theta,\psi,s_b,s_w)\mathbb{P}(\theta,\psi,s_b,s_w)\diff{\theta}\diff{\psi}}{\mathbb{P}(s_b,s_w)}
+    \mathbb{P}(r=1|s_b,s_w) = \frac{\int_{\theta,\psi} \mathbb{P}(r=1|\theta,\psi,s_b,s_w)\mathbb{p}(\theta,\psi,s_b,s_w)\diff{\theta}\diff{\psi}}{\mathbb{p}(s_b,s_w)}
 \end{equation}
 
 \begin{equation}
-    \mathbb{P}(r=1|s_b,s_w) = \frac{\mathbb{P}(s_b,s_w)\int_{\theta,\psi} \mathbb{P}(r=1|\theta,\psi,s_b,s_w)\mathbb{P}(\theta,\psi|s_b,s_w)\diff{\theta}\diff{\psi}}{\mathbb{P}(s_b,s_w)}
+    \mathbb{P}(r=1|s_b,s_w) = \frac{\mathbb{p}(s_b,s_w)\int_{\theta,\psi} \mathbb{P}(r=1|\theta,\psi,s_b,s_w)\mathbb{p}(\theta,\psi|s_b,s_w)\diff{\theta}\diff{\psi}}{\mathbb{p}(s_b,s_w)}
 \end{equation}
 
 Substituting Equation~\ref{p_w_and_p_b_in_r_5}, and splitting $p(\theta,\psi \mid s_b,s_w)$, as they are conditionally independent ($\E[\psi\theta \mid s_b,s_w]=0$, $\E[\theta \mid s_b,s_w]=0$, $\E[\psi \mid s_b,s_w]=0$, therefore, $\Cov(\psi,\theta)=0$), we get:
 
 \begin{equation}
-    \mathbb{P}(r=1|s_b,s_w) = \int_{\psi} \mathbb{1}\Big[\frac{s_b+s_w}{\sqrt{2}\beta}>\psi\Big]\mathbb{P}(\psi|s_b,s_w)\diff{\psi}\underbrace{\int_{\theta}\mathbb{p}(\theta|s_b,s_w)\diff{\theta}}_\text{1}
+    \mathbb{P}(r=1|s_b,s_w) = \int_{\psi} \mathbb{1}\Big[\frac{s_b+s_w}{\sqrt{2}\beta}>\psi\Big]\mathbb{p}(\psi|s_b,s_w)\diff{\psi}\underbrace{\int_{\theta}\mathbb{p}(\theta|s_b,s_w)\diff{\theta}}_\text{1}
 \end{equation}
 
 Also, as $\mathbb{P}(\psi|s_b,s_w)$ has mean of $0$ and variance of $1$, we can model it as such:
@@ -701,7 +701,7 @@ Therefore, substituting Equation~\ref{eq:r_zero_expression_2} and~\ref{eq:r_one_
     \mathbb{P}(r|s_b,s_w) = \mathop{I}(r=1)\Phi\Big[ \frac{s_b-s_w}{\sqrt{2}\beta} \Big] + \mathop{I}(r=0)\Big( 1-\Phi\Big[ \frac{s_b-s_w}{\sqrt{2}\beta} \Big] \Big)
 \end{equation}
 
-The above result is derived for one game. Based on Section~\ref{sec:1d}, I assume that each observed game is independently and identically distributed. I.e. each game does not depend in any way on other games, but only on the two players that play it, thus the expression can be rewritten as follows:
+The above result is derived for one game. Based on Section~\ref{sec:1d}, I assume that each observed game is independently and identically distributed. I.e. every game is independent from the other games and only has dependency relations to the players involved in this particular game, thus the expression can be rewritten as follows:
 
 \begin{equation}
     \label{eq:r_iid}
@@ -742,7 +742,7 @@ When $r^{(k)}=1$, the black player is the winner, similarly, when $r^{(k)}=1$, t
 
 \begin{equation}
     \label{eq:winner_loser}
-    s_{winner}-s_{loser} = (s_b-s_w)^{(1-r^{(k)})}
+    s_{winner}-s_{loser} = (s_b-s_w)(-1)^{(1-r^{(k)})}
 \end{equation}
 
 Thus, we can rewrite Equation~\ref{eq:r_iid_2} as follows:
@@ -763,7 +763,7 @@ Thus, we can rewrite Equation~\ref{eq:r_iid_2} as follows:
     \Big]
 \end{equation}
 
-As the sum of the two indicator functions will always produce 1, thus, we can rewrite Equation~\ref{eq:r_iid} as follows:
+As the sum of the two indicator functions will always produce 1, thus, we can rewrite Equation~\ref{eq:r_iid_4} as follows:
 
 \begin{equation}
     \label{eq:r_iid_5}
@@ -773,7 +773,7 @@ As the sum of the two indicator functions will always produce 1, thus, we can re
     \Big]
 \end{equation}
 
-We can model the relation between $s_{winner}$ and $s_{loser}$ in terms of vectors. As we presented their relationship in Equation~\ref{eq:winner_loser}, it can also be expressed as a product of two vectors, namely $\bm{s}$ and $\bm{x^{(k)}}$. More specifically, $s$ will contain all the M player skills. While $\bm{x^{(k)}}$ will be a zero vector of magnitude M, where the winning player's skill will be substituted by $1$ and the losing player's skill by $-1$. For instance, if $M=30$ (number of players), players $2$ and $28$ play a game, and we want to calculate the probability of $2$ winning, then we would write it as $s=[0,0,1,....,-1,0]^T$. This model, however, does not account for the which player plays which colour, neither it accounts for $komi$ points. As the player's standard deviation ($\beta$), is constant in the model, we can include it in the $\bm{x^{(k)}}$ vector. Therefore, instead of $1$ and $-1$ we can write $\frac{1}{\sqrt{2}\beta}$ and $-\frac{1}{\sqrt{2}\beta}$ respectively. Thus, using the new notation, we can rewrite Equation~\ref{eq:r_iid_5} as follows:
+We can model the relation between $s_{winner}$ and $s_{loser}$ in terms of vectors. As we presented their relationship in Equation~\ref{eq:winner_loser}, it can also be expressed as a product of two vectors, namely $\bm{s}$ and $\bm{x^{(k)}}$. More specifically, $s$ will contain all the $M$ players' skills. While $\bm{x^{(k)}}$ will be a zero vector of magnitude $M$, where the winning player's skill will be substituted by $1$ and the losing player's skill by $-1$. For instance, if $M=30$ (number of players), players $2$ and $28$ play a game, and we want to calculate the probability of $2$ winning, then we would write it as $s=[0,0,1,....,-1,0]^T$. This model, however, does not account for the relations between the players' colours, neither it accounts for $komi$ points. As the player's standard deviation ($\beta$), is constant in the model, we can include it in the $\bm{x^{(k)}}$ vector. Therefore, instead of $1$ and $-1$ we can write $\frac{1}{\sqrt{2}\beta}$ and $-\frac{1}{\sqrt{2}\beta}$ respectively. Thus, using the new notation, we can rewrite Equation~\ref{eq:r_iid_5} as follows:
 
 \begin{equation}
     \label{eq:r_iid_6}
@@ -810,6 +810,7 @@ Substituting the likelihood, Equation~\ref{eq:r_iid_6}, in Equation~\ref{eq:2_f_
 \label{sec:3}
 
 \subsection{}
+\label{sec:3a}
 In order to interpret the graphs, I will firstly illustrate the process of expectation propagation with messages, passing through the graph, given in Figure 2 of the assignment sheet, which copy is presented at Figure~\ref{fig:fig_2_assignment}. There, the flow of messages for only one game of Go are shown and are labelled in red and blue. Further, I will associate some of the messages with the different plots and explain what they represent.
 \begin{figure}[htpb!]
     \centering
@@ -849,16 +850,16 @@ In order to interpret the graphs, I will firstly illustrate the process of expec
         \draw node [above=of alpha, fill=white, xshift=3.9cm, yshift=-2.7cm] {\textcolor{blue}{(8)}};
         \draw node [above=of alpha, fill=white, xshift=2cm, yshift=-2.7cm] {\textcolor{red}{(9)}};
     }
-    \caption{Factor graph of Gaussian player skill model for a single game. The variables $r^{(1)}$, $s_b$ and $s_w$ are as defined for Figure~\ref{fig:fg}. The variables $p_b$ and $p_w$ are the performances of the black and white player respectively in the game. The red edges are the original messages, where as the blue edges are the approximated ones for each individual factor locally.}
+    \caption{Factor graph of Gaussian player skill model for a single game. The variables $r^{(1)}$, $s_b$ and $s_w$ are as defined for Figure~\ref{fig:fg}. The variables $p_b$ and $p_w$ are the performances of the black and white player respectively in the game. The red edges are the original messages, whereas the blue edges are the approximated ones for each individual factor locally.}
     \label{fig:fig_2_assignment}
 \end{figure}
 
-On Figure~\ref{fig:fig_2_assignment}, message $(1)$ is only a Gaussian ($\mathcal{N}(s_w;0,\sigma^2)$) from the factor on the left. Message $(2)$ is a product of the all connected factors to the variable $s_w$, which in this case is only 1 - the Gaussian, therefore, it is just a copy of that Gaussian. In order to calculate message $(3)$, we have to multiply the output from message $(2)$ with the factor $\mathcal{N}(p_w;s_w,\beta^2)$ and integrate over $s_w$. This convolution could be estimated exactly~\cite[Equation 2.115]{bishop2006pattern} and produces another Gaussian distribution. Message $(4)$ is a copy of message $(3)$, as it represents the product of all incoming messages, which in this case is only the output from $(3)$. Message $(5)$ is a Bernoulli distribution. To compute message $(6)$, we have to product messages $(4)$ and $(5)$, integrate over $p_w$ and sum over $r^{(1)}$. If we consider the case, where black are the winners, i.e. $r^{(1)}=1 \Leftrightarrow \mathbb{1}[p_b > p_w]$, then message $(5)$ becomes 1, similarly it becomes 0, when $r^{(1)}=0 \Leftrightarrow \mathbb{1}[p_w \geq p_b]$. From this, we can deduct that the regions. where $p_w$ is winning will be multiplied by 0~\cite{bishop2013model}. Finally, when we integrate over $p_w$, we receive the true factor, showed in green on Figure~\ref{fig:diag_from_orig}.
+In Figure~\ref{fig:fig_2_assignment}, message $(1)$ is only a Gaussian ($\mathcal{N}(s_w;0,\sigma^2)$) from the factor on the left. Message $(2)$ is a product of the all connected factors to the variable $s_w$, which in this case is only 1 - the Gaussian, therefore, it is just a copy of that Gaussian. In order to calculate message $(3)$, we have to multiply the output from message $(2)$ with the factor $\mathcal{N}(p_w;s_w,\beta^2)$ and integrate over $s_w$. This convolution could be estimated exactly~\cite[Equation 2.115]{bishop2006pattern} and produces another Gaussian distribution. Message $(4)$ is a copy of message $(3)$, as it represents the product of all incoming messages, which in this case is only the output from $(3)$. Message $(5)$ is a Bernoulli distribution. To compute message $(6)$, we have to product messages $(4)$ and $(5)$, integrate over $p_w$ and sum over $r^{(1)}$. If we consider the case, where black are the winners, i.e. $r^{(1)}=1 \Leftrightarrow \mathbb{1}[p_b > p_w]$, then message $(5)$ becomes 1, similarly it becomes 0, when $r^{(1)}=0 \Leftrightarrow \mathbb{1}[p_w \geq p_b]$. From this, we can deduct that the regions. where $p_w$ is winning will be multiplied by 0~\cite{bishop2013model}. Finally, when we integrate over $p_w$, we receive the true factor, showed in green on Figure~\ref{fig:diag_from_orig}.
 
 \begin{figure}[htpb!]
     \centering
     \includegraphics[scale=0.5]{diag_from_ass}
-    \caption{Values of corresponding approximate and true factors and scaled value of approximate posterior density along line $s=s|x^{(k)}|^{-1}x^{(k)}$ for a single factor in the diagonal covariance approximate densities.}
+    \caption{Values of corresponding approximate and true factors and scaled value of approximate posterior density along line $s=s|x^{(k)}|^{-1}x^{(k)}$ for a single factor in the diagonal covariance approximate densities, adopted from the assignment sheet.}
     \label{fig:diag_from_orig}
 \end{figure}
 
@@ -943,25 +944,24 @@ Now if we divide by the context message ($c_k$), we will receive the factor appr
 
 Continuing with the messages in Figure~\ref{fig:fig_2_assignment}, now that we have that the message approximation $(6)$ is a Gaussian, message $(7)$ is just a copy of it, but it also differs from its original message, that was supposed to be a normal CDF. Message $(8)$ is again a convolution of two Gaussians - the factor and the message, which results in a Gaussian. Also, please note that message $(8)$ is also different from its original message. 
 
-Now we can now calculate the approximate posterior for the black player ($s_b$) - the orange plot on Figure~\ref{fig:diag_from_orig}. This can be done by multiplying the two Gaussians from message $(8)$ and $(9)$, that will result in another Gaussian. This way, when another game between the same black player is played, his new skill can be directly applied. Meaning that instead of a resulting in a CDF, it is now a Gaussian, having 2 parameters, same as the original $s_b$ and $s_w$. This can be also thought of as the concept of conjugate priors - between different games we try to have identical distributions so that our model keeps consistent and does not grow in complexity. Figures~\ref{fig:black_predicted_wins} and~\ref{fig:black_loses} help to imagine intuitively how the skill of a player will change, depending on the other player. For instance, 
-if the black player has more skill, than the white player, and wins, his skill should not be updated by a lot, as it was expected from him to win. Similarly, the white player's skill is reduced, but not by much, and his certainty is growing (i.e. lower variance). This is illustrated on Figure~\ref{fig:black_predicted_wins}.
+Now we can now calculate the approximate posterior for the black player ($s_b$) - the orange plot on Figure~\ref{fig:diag_from_orig}. This can be done by multiplying the two Gaussians from message $(8)$ and $(9)$, that will result in another Gaussian. This way, when another game with the same black player is played, his new skill posterior can be directly applied. Meaning that instead of a resulting in a CDF, it is now a Gaussian, having 2 parameters, same as the original $s_b$ and $s_w$. This can be also thought of as the concept of conjugate priors - between different games we try to have identical distributions so that our model keeps consistent and does not grow in complexity. Figure~\ref{fig:black_predicted_wins} and~\ref{fig:black_loses} help to imagine intuitively how the skill of a player will change, depending on the other player. For instance, 
+if the black player has more skill, than the white player, and wins, his skill should not be significantly updated, as it was expected that the white player would win. Similarly, the white player's skill is reduced, but not by much, and his certainty is growing (i.e. lower variance). This is illustrated on Figure~\ref{fig:black_predicted_wins}.
 
 \begin{figure}[htpb!]
     \centering
     \includegraphics[scale=0.5]{black_predicted_wins}
-    \caption{Black player wins, where black player is in blue and the white player is represented by the red curve. The priors are showed in dashed lines, whereas the posteriors are shown in solid lines~\cite{bishop2013model}.}
+    \caption{Black player wins, where black player is in blue and the white player is represented by the red curve. The priors are showed in dashed lines, whereas the posteriors are shown in solid lines. Adopted from ~\cite{bishop2013model}.}
     \label{fig:black_predicted_wins}
 \end{figure}
 
-If, however, the black player loses, his skill becomes less than the one of the white player (in this concrete example). The white player's skill grows above the black player one, and significantly more than the white player's prior. This is illustrated in Figure~\ref{fig:black_loses}.
+If, however, the black player loses, his skill is reduced in comparison with the white player. The white player's skill grows above the black player one, and as a result it is significantly higher than its prior skill level. This is illustrated in Figure~\ref{fig:black_loses}.
 
 \begin{figure}[htpb!]
     \centering
     \includegraphics[scale=0.5]{black_loses}
-    \caption{Black player loses, where black player is in blue and the white player is represented by the red curve. The priors are showed in dashed lines, whereas the posteriors are shown in solid lines~\cite{bishop2013model}.}
+    \caption{Black player loses, where black player is in blue and the white player is represented by the red curve. The priors are showed in dashed lines, whereas the posteriors are shown in solid lines. Adopted from ~\cite{bishop2013model}.}
     \label{fig:black_loses}
 \end{figure}
-
 
 These posterior marginals (solid lines in Figure~\ref{fig:black_predicted_wins} and~\ref{fig:black_loses}) are an example of $p_a=\mathcal{N}(s;m;V)$ (dashed orange line in Figure~\ref{fig:diag_from_orig}).
 
@@ -1025,7 +1025,7 @@ end
 
 Distributions clearly show that the skill of the two "real" players - Lee Sedol and Fan Hui is well defined, as their variance using both full and diagonal approximation is way smaller, than the variance of AlphaGo. This can be explained by the fact that the two players have played more games than AlphaGo has.
 
-Furthermore, it is interesting to see the difference between using the diagonal and full approximations with respect to the variance. For example, Fan Hui's variance when using the full approximation is larger than when using diagonal approximation. Same goes for Lee Sedol. Whereas, AlphaGo's variance behaves differently - it's lower for the full covariance matrix. Logically, this can be explained by the fact that the full covariance matrix contains more information, i.e. the covariance with respect to the other 1048 players, whereas the diagonal approximation only involves the variance. While this is partially true, there are more factors that have to be taken into account. Firstly, the full covariance matrix doesn't mean that each player played against each other, even though, the entries are non-zero. The reason for this is the inverse of the covariance matrix. Furthermore, the difference between the variance between Fan Hui and AlphaGo is very small, it can be considered as insignificant.
+Furthermore, it is interesting to see the difference between using the diagonal and full approximations with respect to the variance. For example, Fan Hui's variance when using the full approximation is larger than when using diagonal approximation. Same goes for Lee Sedol. Whereas, AlphaGo's variance behaves differently - it is lower for the full covariance matrix. Logically, this can be explained by the fact that the full covariance matrix contains more information, i.e. the covariance with respect to the other 1048 players, whereas the diagonal approximation only involves the variance. While this is partially true, there are more factors that have to be taken into account. Firstly , the full covariance matrix doesn't mean that each player played against each other, even though, the entries are non-zero. The reason for this is the inverse of the covariance matrix. Secondly, the difference between the covariance of Fan Hui and AlphaGo is very small, it can be considered as insignificant.
 
 Finally, one can notice that there is a shift of the mean for all 3 players. When using the diagonal approximation one can see that Lee Sedol's and AlphaGo's skill mean are quite close, even though, their uncertainty level is very different. When using the full covariance matrix, however, we can clearly see, that Lee Sedol's skill is better defined in terms of the graph presented on Figure~\ref{fig:3b_full}. In addition, the skill mean of Lee Sedol is clearly above AlphaGo's one when using the full covariance matrix.
 
@@ -1081,7 +1081,7 @@ end
 \end{lstlisting}
 
 \subsection{}
-Considering the two results in Equation~\ref{eq:ag_vs_ls_diag} and~\ref{eq:ag_vs_ls_full}, as well as the two graphs in Figure~\ref{fig:3b_full} and~\ref{fig:3b_diag}, one could argue that the results are expected. Meaning that when using the diagonal covariance matrix, where the mean of Lee Sedol and Alpha Go is quite close, AlphaGo has 52.726\% of winning. When using the full covariance matrix, one could also observe that as the distributions are further apart, with Lee Sedol's PDF having advantage, it is reasonable to assume that AlphaGo has a lower chance of winning - 36.533\%.
+Considering the two results in Equation~\ref{eq:ag_vs_ls_diag} and~\ref{eq:ag_vs_ls_full}, as well as the two graphs in Figure~\ref{fig:3b_full} and~\ref{fig:3b_diag}, one could argue that the results are expected. Meaning that when using the diagonal covariance matrix, where the means of Lee Sedol and Alpha Go are quite close, AlphaGo has 52.726\% of winning. When using the full covariance matrix, one could also observe that as the distributions are further apart, with Lee Sedol's PDF having advantage, it is reasonable to assume that AlphaGo has a lower chance of winning - 36.533\%.
 
 However, as previously mentioned in Section~\ref{sec:3c}, the full covariance matrix is more informative, as it has the covariances between the rest of the players. In other words it takes into account the previously played games between players when computing the marginal posterior. Having said that, the accuracy of the estimated posterior might be hard to evaluate. The reason is that the skill of a player is something not actually observable, but can be regarded as hidden variable. Thus, it would take lots of trial and error in order to determine whether the approximation is correct or not. These experiments would have to be based on observations of game outcomes.
 This can be confirmed by the fact that on both Figure~\ref{fig:diag_from_orig} and~\ref{fig:full_from_orig} the diagonal and full covariance matrix approximate the true factor almost identically.
@@ -1093,7 +1093,7 @@ This can be confirmed by the fact that on both Figure~\ref{fig:diag_from_orig} a
     \label{fig:full_from_orig}
 \end{figure}
 
-On the other hand, if we have to consider millions of Go players, then the full matrix computation will become very inefficient, as it is computationally expensive to inverse the full covariance matrix. Whereas, inversing the main diagonal of a matrix is essentially inversing a vector, which will take linear time. In fact, Sch{\"o}lkopf et al argue that adopting the full covariance approximation approach, an extra complexity of $\mathcal{O}(K^3N^3)$ is added~\cite{scholkopf2007advances}. Furthermore, they show that when using the diagonal matrix, we lose the "explicit posterior coupling"~\cite{scholkopf2007advances}.
+On the other hand, if we have to consider millions of Go players, then the full matrix computation will become very inefficient, as it is computationally expensive to inverse the full covariance matrix. Whereas, inversing the main diagonal of a matrix is essentially inversing a vector, which will take linear time. In fact, Sch{\"o}lkopf et al.~\cite{scholkopf2007advances} argue that adopting the full covariance approximation approach, an extra complexity of $\mathcal{O}(K^3N^3)$ is added. Furthermore, they show that when using the diagonal matrix, we lose the "explicit posterior coupling"~\cite{scholkopf2007advances}.
 
 \section{}
 
@@ -1104,14 +1104,14 @@ As shown in Section~\ref{sec:2f}, when computing the Cumulative Density Function
     \Phi \Big[ \frac{s_b - s_w}{\sqrt{2}\beta} + \frac{K}{K_{factor}} \Big]
 \end{equation}
 
-A similar implementation was considered in~\cite{stanescu2011rating}, with the slight difference of accounting for handicapped games. In my opinion, accounting for the extension would shift the approximation of the CDF towards the skill of the white player, in order to compensate for the advantage of starting first. This will eventually result in more accurate calculations of the approximate posteriors for the skills of both players.
+A similar implementation was considered in~\cite{stanescu2011rating}, with the slight difference of accounting for handicapped games. In my opinion, accounting for the extension would shift the approximation of the CDF towards the skill of the white player, in order to compensate for the disadvantage of starting second. This will eventually result in more accurate calculations of the approximate posteriors for the skills of both players.
 
 \subsection{}
-In the model so far, we have assumed that the player skill will be fixed, even though we are trying to approximate it, we do not allow it to change dynamically over time. Such situations might happen, when for example, a player has a "bad" day, when he is not performing up to his usual standards, for instance. In order to model this, we can extend the model to account for skill at any given time $t \in \{1..T\}$, such that, $p(s^t|s^{t-1})=\mathcal{N}(0, s_{change})$. In other words, the skill changes through time, where that change is modelled with a zero-mean Gaussian. This means that the skill varies from game to game and on average it does not vary much, i.e. $\mu_{change}=0$. Therefore, our skill posterior will be updated as follows~\cite{bishop2013model}:
+In the model so far, we have assumed that the player skill will be fixed, even though we are trying to approximate it, we do not allow it to change dynamically over time. Such situations might happen, when for example, a player has a "bad" day, when he is not performing up to his usual standards. In order to model this, we can extend the model to account for skill at any given time $t \in \{1..T\}$, such that, $p(s^t|s^{t-1})=\mathcal{N}(skill_{change};0,s_{change})$. In other words, the skill changes through time, where that change is modelled with a zero-mean Gaussian. This means that the skill varies from game to game and on average it does not vary much, i.e. $\mu_{change}=0$. Therefore, our skill posterior will be updated as follows~\cite{bishop2013model}:
 
 \begin{equation}
     \label{eq:4b_bishop}
-    s^t = s^{t-1}+s_{change} = \mathcal{N}(s^t;\mu_{s^{t-e}}, \Var(s_{change}))
+    s^t = s^{t-1}+s_{change} = \mathcal{N}(s^t;\mu_{s^{t-e}}, \Var(skill_{change}))
 \end{equation}
 
 Therefore, the updated factor graph for 2 consecutive games between 2 paired players would look like so:
@@ -1183,7 +1183,7 @@ Therefore, the updated factor graph for 2 consecutive games between 2 paired pla
     \label{fig:skill_var_time}
 \end{figure}
 
-In~\cite{bishop2013model}, Winn and Bishop suggest that we firstly run expectation propagation in the game with outcome $r^{(1)}$. Then, the outgoing messages, from $s^{t-1}_w$ and $s^{t-1}_w$ to $s^{t}_w$ and $s^{t}_w$, are updated skill distributions that pass through the new Gaussian Factors. However, when convoluting these messages with the Gaussian factor (for example $\mathcal{N}(s^t_w;0,s^2_{change})$), essentially, we are introducing more uncertainty between games. This convolution is then used as the new prior for the next game. While introducing more uncertainty with every game may not be intuitive, it allows us to model the skill change of a player through time. Essentially, this new model allows to reflect the possibility of a change in players' skill.
+In~\cite{bishop2013model}, Winn and Bishop suggest that we firstly run expectation propagation in the game with outcome $r^{(1)}$. Then, the outgoing messages, from $s^{t-1}_w$ and $s^{t-1}_w$ to $s^{t}_w$ and $s^{t}_w$, are updated skill distributions that pass through the new Gaussian Factors. However, when convoluting these messages with the Gaussian factor (for example $\mathcal{N}(s^t_w;0,s^2_{change})$), essentially, we are introducing more uncertainty between games. This convolution is then used as the new prior for the next game. While introducing more uncertainty with every game may not be intuitive, it allows us to model the skill change of a player through time~\cite{bishop2013model}. Essentially, this new model allows to reflect the possibility of a change in players' skill.
 
 Figure~\ref{fig:mbml_dynamic_skill_update} shows the improvement made by Winn and Bishop using this model over the previous one. The red line denotes the true skill change, the blue line shows the inferred skill change under the original model used in Section~\ref{sec:2} and~\ref{sec:3}. The green curve shows the updated model's inference, supporting the change of skill over time.
 
@@ -1196,18 +1196,24 @@ Figure~\ref{fig:mbml_dynamic_skill_update} shows the improvement made by Winn an
 
 This approach has several drawbacks - it depends on the order of the update, as well as it does not account for the very old games~\cite{dangauthier2007trueskill}. For instance, on Figure~\ref{fig:mbml_dynamic_skill_update}, if the first 200 games are played 2 years ago, then the model might not be relevant, as other factors could potentially influence players' skill. The second drawback is that inference is only propagated forward in time~\cite{dangauthier2007trueskill}. For example, if player A plays an unseen opponent B and wins, but this opponent turns out to be very good, then the skill of player A is not properly adjusted.
 
-An alternative, suggested by Dangauthier et al is to use a method called TrueSkill Through Time (TTT)~\cite{dangauthier2007trueskill}. Their improvement can be partially applied to the aforementioned model. A significant change would be to track the game outcomes based on different years. For example, $r^{(1)}$ and $r^{(2)}$ will become $r^{y(1)}$ and $r^{y(2)}$ to relate them to games in the same time period (years in this case). This is described as the Vanilla TrueSkill in~\cite{dangauthier2007trueskill}. In order to improve this Vanilla TrueSkill, we have to run the full EP algorithm until convergence for a certain time period ($y$). An important note is that the previous update of the result of a game must be removed before the new one is applied. Thus, the model is consistent, but less approximate~\cite{dangauthier2007trueskill}.
+An alternative, suggested by Dangauthier et al.~\cite{dangauthier2007trueskill} is to use a method called TrueSkill Through Time (TTT). Their improvement can be partially applied to the aforementioned model. A significant change would be to track the game outcomes based on different years. For example, $r^{(1)}$ and $r^{(2)}$ will become $r^{y(1)}$ and $r^{y(2)}$ to relate them to games in the same time period (years in this case). This is described as the Vanilla TrueSkill in~\cite{dangauthier2007trueskill}. In order to improve this Vanilla TrueSkill, we have to run the full EP algorithm until convergence for a certain time period ($y$). An important note is that the previous update of the result of a game must be removed before the new one is applied. Thus, the model is consistent, but less approximate~\cite{dangauthier2007trueskill}.
 
-\subsection{WRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEMEWRITEME}
-In Section~\ref{sec:3}, the expectation propagation inference method is used, that allow intractable distributions to be approximated by Gaussians, it is considered to be the generalisation of loopy belief propagation. In Section~\ref{sec:3}, it is shown how from a normal CDF, we can approximate a Gaussian distribution and use that instead, in order to have a conjugate prior - Gaussian.
+\subsection{}
+In Section~\ref{sec:3}, the expectation propagation inference method is used, that allow intractable distributions to be approximated by Gaussians, it is considered to be the generalisation of loopy belief propagation. In Section~\ref{sec:3a}, it is shown in detail how from a normal CDF, we can approximate a Gaussian distribution and use that instead, in order to have a conjugate prior for the next game - a Gaussian distribution.
 
-A clear disadvantage of EP is that it might not converge~\ref{bishop2006pattern}. However, this is not the case for our model, thus it will not be discussed in detail. Another drawback of EP is that
+One alternative for this model is to use Gibbs Sampling. When evaluating the integral, given in Equation~\ref{eq:big_integral}, the first term ($\mathbb{P} [ r^{\star}=1 \mid s_{b_{\star}},s_{w_{\star}} ]$) is relatively easy to compute, whereas the second term ($\mathbb{p} \Big[ s_{b_{\star}},s_{w_{\star}} \mid \{r^{(k)}\}_{k=1}^{N} \Big]$) could be very computationally expensive. Rather, we can sample from it, minimising this cost.
 
-when evaluating the big integral, the first term is relatively easy to compute, whereas the second term could be very computationally expensive. Thus, one could use the alternative of Gibbs sampling for that case.
+\begin{equation}
+    \label{eq:big_integral}
+    \mathbb{P} \Big[ r^{\star}=1 \mid \{r^{(k)}\}_{k=1}^{N} \Big] =
+    \int_{-\infty}^{\infty} \int_{-\infty}^{\infty} \mathbb{P} [ r^{\star}=1 \mid s_{b_{\star}},s_{w_{\star}} ]
+    \mathbb{p} \Big[ s_{b_{\star}},s_{w_{\star}} \mid \{r^{(k)}\}_{k=1}^{N} \Big]
+    \diff{s_{b_{\star}}} \diff{s_{w_{\star}}}
+\end{equation}
 
-Alternatively, one could use variational approximation 
+While Gibbs sampling takes a lot of time to give an exact result~\cite{epvsvmp}, but could be more computationally efficient for this domain. In addition, MCMC algorithms (Gibbs sampling) is general, but potentially could be expensive, while EP utilises the simplicity in a model~\cite{minkaep}. 
 
-Note that we can compute r|sb,sw easily, but we can use gibbs sampling for the other term.
+A clear disadvantage of EP is that it might not converge~\cite{bishop2006pattern}. However, this is not the case for our model, thus it will not be discussed in detail. Another possible disadvantage of the EP might come from the fact of how it is estimating the Kullback-Leibler (KL) divergence. As KL is not a symmetric ($KL(p||q) \neq KL(q||p)$), estimating $KL(p||q)$ could lead to poor estimations~\cite[Figure 10.3]{bishop2006pattern}. A suitable alternative, both for convergence (even not applicable) and minimising multi-modal distributions would be to use Variational Message Passing (VMP). It rather computes $KL(q||p)$ and is guaranteed to converge (even if not applicable for this domain)~\cite{bishop2006pattern,epvsvmp}. Thus, it would mean that the accuracy of the approximations using VMP would be higher than when using EP. Furthermore, while VMP could require more iterations, than EP, these iterations are cheaper~\cite{minka2001expectation,winn2005variational}. In addition, VMP gives one the flexibility to specify very broad class of conjugate exponential approximating family~\cite{winn2005variational}, if needed. It must be noted, however, that there exists an optimisation for EP cost function, that would guarantee convergence\cite{bishop2006pattern}.
 
 \clearpage
 
